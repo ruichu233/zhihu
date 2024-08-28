@@ -1,0 +1,33 @@
+syntax = "v1"
+type (
+	token struct {
+		AccessToken string `json:"token"`
+		AccessExpire int64 `json:"expire"`
+	}
+
+	EmailRegisterRequest struct {
+		Name string `json:"name"`
+		Password string `json:"password"`
+		Email string `json:"email"`
+		Code string `json:"code"`
+	}
+
+	EmailRegisterResponse {
+		UserId int64 `json:"user_id"`
+		Token  Token `json:"token"`
+	}
+)
+
+type Request {
+	Name string `path:"name,options=you|me"`
+}
+
+type Response {
+	Message string `json:"message"`
+}
+
+service applet-api {
+	@handler AppletHandler
+	get /from/:name (Request) returns (Response)
+}
+
