@@ -1,33 +1,53 @@
 syntax = "v1"
+
 type (
-	token struct {
-		AccessToken string `json:"token"`
-		AccessExpire int64 `json:"expire"`
+	Token {
+		AccessToken  string `json:"access_token"`
+		AccessExpire int64  `json:"access_expire"`
 	}
-
-	EmailRegisterRequest struct {
-		Name string `json:"name"`
+	EmailRegisterRequest {
+		UserName string `json:"name"`
 		Password string `json:"password"`
-		Email string `json:"email"`
-		Code string `json:"code"`
+		Email    string `json:"email"`
+		Code     string `json:"code"`
 	}
-
 	EmailRegisterResponse {
 		UserId int64 `json:"user_id"`
 		Token  Token `json:"token"`
 	}
+	EmailLoginRequest {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	EmailLoginResponse {
+		UserId int64 `json:"user_id"`
+		Token  Token `json:"token"`
+	}
+	UserInfoResponse {
+		UserId   int64  `json:"user_id"`
+		UserName string `json:"name"`
+		Email    string `json:"email"`
+	}
 )
 
-type Request {
-	Name string `path:"name,options=you|me"`
-}
-
-type Response {
-	Message string `json:"message"`
-}
-
+@server (
+	prefix: /v1
+)
 service applet-api {
-	@handler AppletHandler
-	get /from/:name (Request) returns (Response)
+	@handler EmailRegisterHandler
+	post /email-register (EmailRegisterRequest) returns (EmailRegisterResponse)
+
+	@handler EmailLoginHandler
+	post /email-login (EmailLoginRequest) returns (EmailLoginResponse)
+}
+
+@server (
+	prefix:    /v1/user
+	signature: true
+	jwt:       Auth
+)
+service applet-api {
+	@handler UserInfoHandler
+	get /info returns (UserInfoResponse)
 }
 

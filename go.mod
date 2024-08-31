@@ -1,6 +1,6 @@
 module zhihu
 
-go 1.23.0
+go 1.20
 
 require github.com/zeromicro/go-zero v1.7.0
 
