@@ -12,16 +12,16 @@ import (
 	"time"
 )
 
-type Options struct {
-	UserName string
-	Password string
-	Host     string
-	Port     string
-	Database string
-	Charset  string
+type Conf struct {
+	UserName string `json:"user_name,omitempty" yaml:"user_name"`
+	Password string `json:"password,omitempty" yaml:"password"`
+	Host     string `json:"host,omitempty" yaml:"host"`
+	Port     string `json:"port,omitempty" yaml:"port"`
+	Database string `json:"database,omitempty" yaml:"database"`
+	Charset  string `json:"charset,omitempty" yaml:"charset"`
 }
 
-func InitMysql(opt *Options) *gorm.DB {
+func InitMysql(opt *Conf) *gorm.DB {
 	//配置MySQL连接参数
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local", opt.UserName, opt.Password, opt.Host, opt.Port, opt.Database, opt.Charset)
 	db, err := database(dsn)

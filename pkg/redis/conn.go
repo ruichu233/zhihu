@@ -6,17 +6,17 @@ import (
 )
 import redis "github.com/redis/go-redis/v9"
 
-type Options struct {
-	Addr     string
-	Password string
-	DB       int
+type Conf struct {
+	Addr     string `json:"addr,omitempty" yaml:"addr"`
+	Password string `json:"password,omitempty" yaml:"password"`
+	DB       int    `json:"db,omitempty" yaml:"db"`
 }
 
-func InitRedis(opt *Options) *redis.Client {
+func InitRedis(c *Conf) *redis.Client {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     opt.Addr,
-		Password: opt.Password,
-		DB:       opt.DB,
+		Addr:     c.Addr,
+		Password: c.Password,
+		DB:       c.DB,
 	})
 
 	if err := rdb.Ping(context.Background()).Err(); err != nil {

@@ -24,6 +24,7 @@ func NewEmailRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ema
 
 func (l *EmailRegisterLogic) EmailRegister(req *types.EmailRegisterRequest) (resp *types.EmailRegisterResponse, err error) {
 	// todo: add your logic here and delete this line
+	l.svcCtx.
 
 	return
 }
