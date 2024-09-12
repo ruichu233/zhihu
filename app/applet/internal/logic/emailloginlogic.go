@@ -25,5 +25,6 @@ func NewEmailLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *EmailL
 func (l *EmailLoginLogic) EmailLogin(req *types.EmailLoginRequest) (resp *types.EmailLoginResponse, err error) {
 	// todo: add your logic here and delete this line
 
+	resp = &types.EmailLoginResponse{}
 	return
 }
