@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package video;
+option go_package="./video";
+
+
+service video {
+  rpc Publish(PublishRequest) returns(PublishResponse);
+  rpc Feed(FeedRequest) returns(FeedResponse);
+}
+
+message PublishRequest {
+
+}
+
+message PublishResponse {
+  string video_id = 1;
+  string title = 2;
+  string video_url = 3;
+  string cover_url = 4;
+}
+
+message FeedRequest {
+  int64 user_id = 1;
+}
+
+message FeedResponse {}
