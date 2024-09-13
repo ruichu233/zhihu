@@ -1,10 +1,10 @@
-package redis
+package rdb
 
 import (
 	"context"
+	"github.com/redis/go-redis/v9"
 	"log"
 )
-import redis "github.com/redis/go-redis/v9"
 
 type Conf struct {
 	Addr     string `json:"addr,omitempty" yaml:"addr"`
@@ -20,7 +20,7 @@ func InitRedis(c *Conf) *redis.Client {
 	})
 
 	if err := rdb.Ping(context.Background()).Err(); err != nil {
-		log.Fatalf("redis connect error: %v", err)
+		log.Fatalf("rdb connect error: %v", err)
 
 	}
 	return rdb

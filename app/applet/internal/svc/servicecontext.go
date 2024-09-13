@@ -1,10 +1,11 @@
 package svc
 
 import (
-	redis "github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 	"zhihu/app/applet/internal/config"
-	"zhihu/pkg/mysql"
+	"zhihu/pkg/db"
+	"zhihu/pkg/rdb"
 )
 
 type ServiceContext struct {
@@ -16,7 +17,7 @@ type ServiceContext struct {
 func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config: c,
-		DB:     mysql.InitMysql(&c.DB),
-		Redis:  redis.InitRedis(&c.RDB),
+		DB:     db.InitMysql(&c.DB),
+		Redis:  rdb.InitRedis(&c.RDB),
 	}
 }

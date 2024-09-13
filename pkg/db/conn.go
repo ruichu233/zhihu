@@ -1,4 +1,4 @@
-package mysql
+package db
 
 import (
 	"fmt"
@@ -26,7 +26,7 @@ func InitMysql(opt *Conf) *gorm.DB {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=%s&parseTime=True&loc=Local", opt.UserName, opt.Password, opt.Host, opt.Port, opt.Database, opt.Charset)
 	db, err := database(dsn)
 	if err != nil {
-		log.Fatalf("mysql connect error: %v", err)
+		log.Fatalf("db connect error: %v", err)
 	}
 	return db
 }
