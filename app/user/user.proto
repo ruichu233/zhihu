@@ -7,6 +7,7 @@ option go_package="./user";
 service User {
   rpc Ping(Request) returns(Response);
   rpc Login(LoginRequest) returns(LoginResponse);
+  rpc Register(RegisterRequest) returns(RegisterResponse);
   rpc VerifyToken(VerifyTokenRequest) returns(VerifyTokenResponse);
   rpc GetUserInfo(UserInfoRequest) returns(UserInfoResponse);
   rpc GetUserFollowerList(FollowerListRequest) returns(FollowerListResponse);
@@ -27,6 +28,16 @@ message LoginRequest {
 }
 
 message LoginResponse {
+  string token = 1;
+}
+
+message RegisterRequest {
+  string username = 1;
+  string password = 2;
+  string email = 3;
+}
+
+message RegisterResponse {
   string token = 1;
 }
 
