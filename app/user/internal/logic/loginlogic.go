@@ -2,6 +2,11 @@ package logic
 
 import (
 	"context"
+	"errors"
+	"gorm.io/gorm"
+	"strconv"
+	user_model "zhihu/pkg/model/user"
+	"zhihu/pkg/token"
 
 	"zhihu/app/user/internal/svc"
 	"zhihu/app/user/pb/user"
@@ -24,7 +29,25 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(in *user.LoginRequest) (*user.LoginResponse, error) {
-	// todo: add your logic here and delete this line
-
-	return &user.LoginResponse{}, nil
+	// 1、检查用户是否存在
+	var u user_model.Users
+	err := l.svcCtx.DB.Model(&user_model.Users{}).Find(&u, "email = ?", in.Email).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, errors.New("用户不存在")
+	}
+	// 2、检查密码是否正确
+	if u.Password != in.Password {
+		return nil, errors.New("密码错误")
+	}
+	// 3、生成token
+	accessToken, err := token.Sign(strconv.FormatInt(u.Id, 10))
+	if err != nil {
+		return nil, err
+	}
+	return &user.LoginResponse{
+		Token: accessToken,
+	}, nil
 }

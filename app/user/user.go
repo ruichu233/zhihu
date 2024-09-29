@@ -8,6 +8,7 @@ import (
 	"zhihu/app/user/internal/server"
 	"zhihu/app/user/internal/svc"
 	"zhihu/app/user/pb/user"
+	"zhihu/pkg/idgenerator"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
@@ -24,6 +25,9 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 	ctx := svc.NewServiceContext(c)
+
+	// ID生成器初始化
+	idgenerator.InitIdGenerator(c.WorkId)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		user.RegisterUserServer(grpcServer, server.NewUserServer(ctx))

@@ -24,7 +24,6 @@ func NewGetUserFollowerListLogic(ctx context.Context, svcCtx *svc.ServiceContext
 }
 
 func (l *GetUserFollowerListLogic) GetUserFollowerList(in *user.FollowerListRequest) (*user.FollowerListResponse, error) {
-	// todo: add your logic here and delete this line
 
 	return &user.FollowerListResponse{}, nil
 }

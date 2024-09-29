@@ -20,7 +20,7 @@ func InitRedis(c *Conf) *redis.Client {
 	})
 
 	if err := rdb.Ping(context.Background()).Err(); err != nil {
-		log.Fatalf("rdb connect error: %v", err)
+		log.Fatalf("rdb connect error: %v\n", err)
 
 	}
 	return rdb

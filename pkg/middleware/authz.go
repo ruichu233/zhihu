@@ -17,7 +17,15 @@ func Authz(a Auther) gin.HandlerFunc {
 		log.Printf("sub: %s, obj: %s, act: %s", sub, obj, act)
 		allow, err := a.Authorize(sub, obj, act)
 		if err != nil {
-
+			log.Printf("authorize failed: %s", err)
+			ctx.AbortWithStatus(403)
+			return
 		}
+		if !allow {
+			log.Printf("authorize failed: %s", err)
+			ctx.AbortWithStatus(403)
+			return
+		}
+		ctx.Next()
 	}
 }

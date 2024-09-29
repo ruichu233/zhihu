@@ -23,7 +23,9 @@ func NewEmailLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *EmailL
 }
 
 func (l *EmailLoginLogic) EmailLogin(req *types.EmailLoginRequest) (resp *types.EmailLoginResponse, err error) {
-	// todo: add your logic here and delete this line
+	resp = new(types.EmailLoginResponse)
+	// 查询用户是否存在
+	user, err := l.svcCtx.UserModel.FindOneByEmail(l.ctx, req.Email)
 
 	resp = &types.EmailLoginResponse{}
 	return

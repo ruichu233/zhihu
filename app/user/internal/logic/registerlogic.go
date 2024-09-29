@@ -2,9 +2,14 @@ package logic
 
 import (
 	"context"
+	"errors"
+	"github.com/yitter/idgenerator-go/idgen"
+	"strconv"
+	"zhihu/pkg/token"
 
 	"zhihu/app/user/internal/svc"
 	"zhihu/app/user/pb/user"
+	user_model "zhihu/pkg/model/user"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +29,49 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 }
 
 func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterResponse, error) {
-	// todo: add your logic here and delete this line
+	// 1、检测邮箱是否注册
+	var u user_model.Users
+	err := l.svcCtx.DB.Model(&user_model.Users{}).Find(&u, "email = ?", in.Email).Error
+	if err != nil {
+		return nil, err
+	}
+	if u.Id != 0 {
+		return nil, errors.New("邮箱已注册")
+	}
 
-	return &user.RegisterResponse{}, nil
+	// 2、检查验证码是否过期
+	result, err := l.svcCtx.RDB.Exists(l.ctx, in.Email).Result()
+	if err != nil {
+		return nil, err
+	}
+	if result == 0 {
+		return nil, errors.New("验证码已过期")
+	}
+
+	// 3、检查验证码是否正确
+	code, err := l.svcCtx.RDB.Get(l.ctx, in.Email).Result()
+	if err != nil {
+		return nil, err
+	}
+	if code != in.Code {
+		return nil, errors.New("验证码不正确")
+	}
+	// 4、注册用户
+	u.Id = idgen.NextId()
+	u.Email = in.Email
+	u.Password = in.Password
+	u.UserName = in.Username
+	err = l.svcCtx.DB.Model(&user_model.Users{}).Create(&u).Error
+	if err != nil {
+		return nil, err
+	}
+	l.svcCtx.RDB.Del(l.ctx, in.Email)
+	// 5、返回token
+	tokenString, err := token.Sign(strconv.FormatInt(u.Id, 10))
+	if err != nil {
+		return nil, err
+	}
+	return &user.RegisterResponse{
+		Token: tokenString,
+	}, nil
 }
