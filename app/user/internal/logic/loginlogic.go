@@ -5,7 +5,7 @@ import (
 	"errors"
 	"gorm.io/gorm"
 	"strconv"
-	user_model "zhihu/pkg/model/user"
+	"zhihu/app/user/model"
 	"zhihu/pkg/token"
 
 	"zhihu/app/user/internal/svc"
@@ -30,8 +30,8 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 
 func (l *LoginLogic) Login(in *user.LoginRequest) (*user.LoginResponse, error) {
 	// 1、检查用户是否存在
-	var u user_model.Users
-	err := l.svcCtx.DB.Model(&user_model.Users{}).Find(&u, "email = ?", in.Email).Error
+	var u model.Users
+	err := l.svcCtx.DB.Model(&model.Users{}).Find(&u, "email = ?", in.Email).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}
@@ -48,6 +48,6 @@ func (l *LoginLogic) Login(in *user.LoginRequest) (*user.LoginResponse, error) {
 		return nil, err
 	}
 	return &user.LoginResponse{
-		Token: accessToken,
+		AccessToken: accessToken,
 	}, nil
 }

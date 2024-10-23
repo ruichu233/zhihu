@@ -6,22 +6,42 @@ option go_package="./video";
 
 service video {
   rpc Publish(PublishRequest) returns(PublishResponse);
-  rpc Feed(FeedRequest) returns(FeedResponse);
+  rpc Detail(DetailRequest) returns(DetailResponse);
 }
-
 message PublishRequest {
-
+  int64 author_id = 1;
+  string video_url = 2;
+  string title = 3;
+  string cover_url = 4;
+  string description = 5;
+  repeated int64 tag_ids = 6;
 }
 
 message PublishResponse {
+  int64 video_id = 1;
+}
+
+message DetailRequest {
+  int64 video_id = 1;
+}
+
+message DetailResponse {
+  int64 author_id = 1;
+  string video_url = 2;
+  string title = 3;
+  string cover_url = 4;
+  string description = 5;
+  repeated int64 tag_ids = 6;
+  int64 comment_count = 7;
+  int64 like_count = 8;
+}
+
+
+message VideoFeed {
   string video_id = 1;
   string title = 2;
   string video_url = 3;
   string cover_url = 4;
+  int64 create_time = 5;
+  int64 author_id = 6;
 }
-
-message FeedRequest {
-  int64 user_id = 1;
-}
-
-message FeedResponse {}

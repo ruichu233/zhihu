@@ -5,11 +5,11 @@ import (
 	"errors"
 	"github.com/yitter/idgenerator-go/idgen"
 	"strconv"
+	"zhihu/app/user/model"
 	"zhihu/pkg/token"
 
 	"zhihu/app/user/internal/svc"
 	"zhihu/app/user/pb/user"
-	user_model "zhihu/pkg/model/user"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -30,15 +30,14 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 
 func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterResponse, error) {
 	// 1、检测邮箱是否注册
-	var u user_model.Users
-	err := l.svcCtx.DB.Model(&user_model.Users{}).Find(&u, "email = ?", in.Email).Error
+	var u model.Users
+	err := l.svcCtx.DB.Model(model.Users{}).Limit(1).Find(&u, "email = ?", in.Email).Error
 	if err != nil {
 		return nil, err
 	}
 	if u.Id != 0 {
 		return nil, errors.New("邮箱已注册")
 	}
-
 	// 2、检查验证码是否过期
 	result, err := l.svcCtx.RDB.Exists(l.ctx, in.Email).Result()
 	if err != nil {
@@ -61,7 +60,7 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 	u.Email = in.Email
 	u.Password = in.Password
 	u.UserName = in.Username
-	err = l.svcCtx.DB.Model(&user_model.Users{}).Create(&u).Error
+	err = l.svcCtx.DB.Model(&model.Users{}).Create(&u).Error
 	if err != nil {
 		return nil, err
 	}
@@ -72,6 +71,6 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 		return nil, err
 	}
 	return &user.RegisterResponse{
-		Token: tokenString,
+		AccessToken: tokenString,
 	}, nil
 }

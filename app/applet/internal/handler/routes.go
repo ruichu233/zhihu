@@ -4,7 +4,7 @@ package handler
 import (
 	"net/http"
 
-	"applet/internal/svc"
+	"zhihu/app/applet/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -22,19 +22,26 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/email-register",
 				Handler: EmailRegisterHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/verification",
+				Handler: VerificationHandler(serverCtx),
+			},
 		},
 		rest.WithPrefix("/v1"),
 	)
 
 	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodGet,
-				Path:    "/info",
-				Handler: UserInfoHandler(serverCtx),
-			},
-		},
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AuthMiddleware, serverCtx.MustLoginMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/:id",
+					Handler: UserInfoHandler(serverCtx),
+				},
+			}...,
+		),
 		rest.WithSignature(serverCtx.Config.Signature),
 		rest.WithPrefix("/v1/user"),
 	)

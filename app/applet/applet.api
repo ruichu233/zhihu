@@ -1,27 +1,28 @@
 syntax = "v1"
 
 type (
-	Token {
-		AccessToken  string `json:"access_token"`
-		AccessExpire int64  `json:"access_expire"`
-	}
 	EmailRegisterRequest {
-		UserName string `json:"name"`
-		Password string `json:"password"`
-		Email    string `json:"email"`
-		Code     string `json:"code"`
+		UserName   string `json:"name"`
+		Password   string `json:"password"`
+		RePassword string `json:"re_password"`
+		Email      string `json:"email"`
+		Code       string `json:"code"`
 	}
 	EmailRegisterResponse {
-		UserId int64 `json:"user_id"`
-		Token  Token `json:"token"`
+		UserId      int64  `json:"user_id"`
+		AccessToken string `json:"token"`
 	}
+	VerificationRequest {
+		Email string `json:"email"`
+	}
+	VerificationResponse  {}
 	EmailLoginRequest {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 	EmailLoginResponse {
-		UserId int64 `json:"user_id"`
-		Token  Token `json:"token"`
+		UserId      int64  `json:"user_id"`
+		AccessToken string `json:"token"`
 	}
 	UserInfoResponse {
 		UserId   int64  `json:"user_id"`
@@ -37,17 +38,20 @@ service applet-api {
 	@handler EmailRegisterHandler
 	post /email-register (EmailRegisterRequest) returns (EmailRegisterResponse)
 
+	@handler VerificationHandler
+	post /verification (VerificationRequest) returns (VerificationResponse)
+
 	@handler EmailLoginHandler
 	post /email-login (EmailLoginRequest) returns (EmailLoginResponse)
 }
 
 @server (
-	prefix:    /v1/user
-	signature: true
-	jwt:       Auth
+	prefix:     /v1/user
+	signature:  true
+	middleware: AuthMiddleware,MustLoginMiddleware
 )
 service applet-api {
 	@handler UserInfoHandler
-	get /info returns (UserInfoResponse)
+	get /:id returns (UserInfoResponse)
 }
 

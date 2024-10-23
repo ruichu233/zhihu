@@ -8,7 +8,6 @@ service User {
   rpc Ping(Request) returns(Response);
   rpc Login(LoginRequest) returns(LoginResponse);
   rpc Register(RegisterRequest) returns(RegisterResponse);
-  rpc VerifyToken(VerifyTokenRequest) returns(VerifyTokenResponse);
   rpc GetUserInfo(UserInfoRequest) returns(UserInfoResponse);
   rpc GetUserFollowerList(FollowerListRequest) returns(FollowerListResponse);
   rpc GetUserFollowedList(FollowedListRequest) returns(FollowerListResponse);
@@ -28,7 +27,8 @@ message LoginRequest {
 }
 
 message LoginResponse {
-  string access_token = 1;
+  int64 user_id = 1;
+  string access_token = 2;
 }
 
 message RegisterRequest {
@@ -39,15 +39,8 @@ message RegisterRequest {
 }
 
 message RegisterResponse {
-  string access_token = 1;
-}
-
-message VerifyTokenRequest {
-  string access_token = 1;
-}
-message VerifyTokenResponse {
-  string username = 2;
-  int64 user_id = 3;
+  int64 user_id = 1;
+  string access_token = 2;
 }
 
 message UserInfoRequest {
@@ -55,10 +48,11 @@ message UserInfoRequest {
 }
 
 message UserInfoResponse {
-  string username = 1;
-  string email = 2;
-  int64 follower_count = 3;
-  int64 followed_count = 4;
+  int64 id = 1;
+  string username = 2;
+  string email = 3;
+  int64 follower_count = 4;
+  int64 followed_count = 5;
 }
 
 message FollowerListRequest {
@@ -73,4 +67,14 @@ message FollowedListResponse {
   repeated UserInfoResponse user_list = 1;
 }
 
+message FindByEmailRequest {
+  string email = 1;
+}
+
+message FindByEmailResponse {
+  int64 user_id = 1;
+  string password = 2;
+  string username = 3;
+  string email = 4;
+}
 

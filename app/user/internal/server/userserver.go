@@ -37,11 +37,6 @@ func (s *UserServer) Register(ctx context.Context, in *user.RegisterRequest) (*u
 	return l.Register(in)
 }
 
-func (s *UserServer) VerifyToken(ctx context.Context, in *user.VerifyTokenRequest) (*user.VerifyTokenResponse, error) {
-	l := logic.NewVerifyTokenLogic(ctx, s.svcCtx)
-	return l.VerifyToken(in)
-}
-
 func (s *UserServer) GetUserInfo(ctx context.Context, in *user.UserInfoRequest) (*user.UserInfoResponse, error) {
 	l := logic.NewGetUserInfoLogic(ctx, s.svcCtx)
 	return l.GetUserInfo(in)

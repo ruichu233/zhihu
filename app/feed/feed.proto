@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package feed;
+option go_package="./feed";
+
+message Request {
+  string ping = 1;
+}
+
+message Response {
+  string pong = 1;
+}
+
+service Feed {
+  rpc Ping(Request) returns(Response);
+}
