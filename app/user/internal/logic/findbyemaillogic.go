@@ -31,8 +31,8 @@ func (l *FindByEmailLogic) FindByEmail(in *user.FindByEmailRequest) (*user.FindB
 	if len(in.Email) == 0 {
 		return nil, fmt.Errorf("邮箱不能为空")
 	}
-	var users model.Users
-	if err := l.svcCtx.DB.Model(&model.Users{}).Limit(1).Find(&users, "email = ?", in.Email).Error; err != nil {
+	var users model.User
+	if err := l.svcCtx.DB.Model(&model.User{}).Limit(1).Find(&users, "email = ?", in.Email).Error; err != nil {
 		return nil, err
 	}
 	return &user.FindByEmailResponse{

@@ -3,10 +3,10 @@ package logic
 import (
 	"context"
 	"errors"
-	"gorm.io/gorm"
 	"strconv"
 	"zhihu/app/user/model"
 	"zhihu/pkg/token"
+	"zhihu/pkg/utils"
 
 	"zhihu/app/user/internal/svc"
 	"zhihu/app/user/pb/user"
@@ -30,16 +30,14 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 
 func (l *LoginLogic) Login(in *user.LoginRequest) (*user.LoginResponse, error) {
 	// 1、检查用户是否存在
-	var u model.Users
-	err := l.svcCtx.DB.Model(&model.Users{}).Find(&u, "email = ?", in.Email).Error
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+	var u model.User
+	err := l.svcCtx.DB.Model(&model.User{}).Limit(1).Find(&u, "email = ?", in.Email).Error
+	if err != nil {
 		return nil, err
 	}
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, errors.New("用户不存在")
-	}
+
 	// 2、检查密码是否正确
-	if u.Password != in.Password {
+	if utils.Md5Crypt(u.Password) != in.Password {
 		return nil, errors.New("密码错误")
 	}
 	// 3、生成token
@@ -48,6 +46,7 @@ func (l *LoginLogic) Login(in *user.LoginRequest) (*user.LoginResponse, error) {
 		return nil, err
 	}
 	return &user.LoginResponse{
+		UserId:      u.Id,
 		AccessToken: accessToken,
 	}, nil
 }

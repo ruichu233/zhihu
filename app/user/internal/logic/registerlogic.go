@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"zhihu/app/user/model"
 	"zhihu/pkg/token"
+	"zhihu/pkg/utils"
 
 	"zhihu/app/user/internal/svc"
 	"zhihu/app/user/pb/user"
@@ -30,16 +31,16 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 
 func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterResponse, error) {
 	// 1、检测邮箱是否注册
-	var u model.Users
-	err := l.svcCtx.DB.Model(model.Users{}).Limit(1).Find(&u, "email = ?", in.Email).Error
+	var u model.User
+	err := l.svcCtx.DB.Model(model.User{}).Limit(1).Find(&u, "email = ?", in.Email).Error
 	if err != nil {
 		return nil, err
 	}
-	if u.Id != 0 {
+	if u.Id > 0 {
 		return nil, errors.New("邮箱已注册")
 	}
 	// 2、检查验证码是否过期
-	result, err := l.svcCtx.RDB.Exists(l.ctx, in.Email).Result()
+	result, err := l.svcCtx.RDB.Exists(l.ctx, in.Code).Result()
 	if err != nil {
 		return nil, err
 	}
@@ -58,9 +59,9 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 	// 4、注册用户
 	u.Id = idgen.NextId()
 	u.Email = in.Email
-	u.Password = in.Password
+	u.Password = utils.Md5Crypt(in.Password)
 	u.UserName = in.Username
-	err = l.svcCtx.DB.Model(&model.Users{}).Create(&u).Error
+	err = l.svcCtx.DB.Model(&model.User{}).Create(&u).Error
 	if err != nil {
 		return nil, err
 	}
@@ -71,6 +72,7 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 		return nil, err
 	}
 	return &user.RegisterResponse{
+		UserId:      u.Id,
 		AccessToken: tokenString,
 	}, nil
 }
