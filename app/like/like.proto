@@ -13,4 +13,78 @@ message Response {
 
 service Like {
   rpc Ping(Request) returns(Response);
+  // 点赞/取消点赞
+  rpc LikeAction(LikeActionRequest) returns(LikeActionResponse);
+  // 查询是否对单obj点过赞
+  rpc CheckLikeStatus(CheckLikeStatusRequest) returns (CheckLikeStatusResponse);
+  // 查询某个稿件的点赞数
+  rpc GetPostLikeCount(GetPostLikeCountRequest) returns (GetPostLikeCountResponse);
+  // 查询某个用户的点赞列表
+  rpc GetUserLikes(GetUserLikesRequest) returns (GetUserLikesResponse);
+  // 查询点赞人列表
+  rpc GetPostLikers(GetPostLikersRequest) returns (GetPostLikersResponse);
+  // 查询用户收到的总点赞数
+  rpc GetUserTotalLikes(GetUserTotalLikesRequest) returns (GetUserTotalLikesResponse);
+}
+
+message LikeActionRequest {
+  string bizId = 1; // 业务id
+  int64 objId = 2; // 点赞对象id
+  int64 userId  = 3; // 用户id
+  enum ActionType {
+    UNKNOWN = 0;
+    LIKE = 1;
+    UNLIKE = 2;
+  }
+  ActionType action_type = 4;  // 要执行的动作类型
+}
+
+message LikeActionResponse {
+  int64 like_count = 1;
+}
+
+message CheckLikeStatusRequest {
+  string bizId = 1; // 业务id
+  int64 objId = 2; // 点赞对象id
+  int64 userId  = 3; // 用户id
+}
+
+message CheckLikeStatusResponse {
+  string bizId = 1; // 业务id
+  int64 objId = 2; // 点赞对象id
+  int64 userId  = 3; // 用户id
+}
+
+message GetPostLikeCountRequest {
+  string bizId = 1; // 业务id
+  int64 objId = 2; // 点赞对象id
+}
+
+message GetPostLikeCountResponse {
+  int32 count = 1;
+}
+
+message GetUserLikesRequest {
+  string user_id = 1;
+}
+
+message GetUserLikesResponse {
+  repeated string post_ids = 1;
+}
+
+message GetPostLikersRequest {
+  string bizId = 1; // 业务id
+  int64 objId = 2; // 点赞对象id
+}
+
+message GetPostLikersResponse {
+  repeated string user_ids = 1;
+}
+
+message GetUserTotalLikesRequest {
+  string user_id = 1;
+}
+
+message GetUserTotalLikesResponse {
+  int32 total_likes = 1;
 }

@@ -1,0 +1,1 @@
+goctl.exe rpc protoc like.proto --go_out=./pb --go-grpc_out=./pb --zrpc_out=. --client=true
