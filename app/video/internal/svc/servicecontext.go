@@ -6,6 +6,7 @@ import (
 	"github.com/zeromicro/go-zero/core/discov"
 	"github.com/zeromicro/go-zero/zrpc"
 	"gorm.io/gorm"
+	"zhihu/app/feed/pb/feed"
 	"zhihu/app/user/pb/user"
 	"zhihu/app/video/internal/config"
 	"zhihu/pkg/db"
@@ -19,6 +20,7 @@ type ServiceContext struct {
 	RDB        *redis.Client
 	OSS        *minio.Client
 	UserClient user.UserClient
+	FeedRPC    feed.FeedClient
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
