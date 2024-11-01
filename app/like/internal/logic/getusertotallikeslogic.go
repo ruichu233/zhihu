@@ -25,7 +25,6 @@ func NewGetUserTotalLikesLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 
 // 查询用户收到的总点赞数
 func (l *GetUserTotalLikesLogic) GetUserTotalLikes(in *like.GetUserTotalLikesRequest) (*like.GetUserTotalLikesResponse, error) {
-	// todo: add your logic here and delete this line
 
 	return &like.GetUserTotalLikesResponse{}, nil
 }

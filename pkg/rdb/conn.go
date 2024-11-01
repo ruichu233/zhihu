@@ -7,9 +7,9 @@ import (
 )
 
 type Conf struct {
-	Addr     string `json:"addr,omitempty" yaml:"addr"`
-	Password string `json:"password,omitempty" yaml:"password"`
-	DB       int    `json:"db,omitempty" yaml:"db"`
+	Addr     string `json:"addr" yaml:"addr"`
+	Password string `json:"password" yaml:"password"`
+	DB       int    `json:"db" yaml:"db"`
 }
 
 func InitRedis(c *Conf) *redis.Client {

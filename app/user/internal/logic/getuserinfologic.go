@@ -32,7 +32,7 @@ func (l *GetUserInfoLogic) GetUserInfo(in *user.UserInfoRequest) (*user.UserInfo
 	// 2、根据用户id查询用户关注数和粉丝数
 
 	return &user.UserInfoResponse{
-		Username: u.UserName,
+		Username: u.Username,
 		Email:    u.Email,
 	}, nil
 }

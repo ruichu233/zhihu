@@ -1,14 +1,11 @@
 package model
 
-import "zhihu/pkg/model"
-
-type Follows struct {
-	model.BaseModel
-	UserId         int64 `gorm:"column:user_id;type:bigint(20);not null" json:"user_id"`
-	FollowedUserId int64 `gorm:"column:followed_user_id;type:bigint(20);not null" json:"followed_user_id"`
-	FollowStatus   int   `gorm:"column:follow_status;type:tinyint(1);not null" json:"follow_status"`
+type Follow struct {
+	BaseModel
+	FollowerID int64 `gorm:"column:follower_id;type:bigint(20);not null" json:"follower_id"` // 关注者的ID
+	FolloweeID int64 `gorm:"column:followee_id;type:bigint(20);not null" json:"followee_id"` // 被关注者的ID
 }
 
-func (Follows) TableName() string {
+func (Follow) TableName() string {
 	return "follows"
 }

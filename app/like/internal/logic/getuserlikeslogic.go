@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"zhihu/app/like/model"
 
 	"zhihu/app/like/internal/svc"
 	"zhihu/app/like/pb/like"
@@ -25,7 +26,8 @@ func NewGetUserLikesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetU
 
 // 查询某个用户的点赞列表
 func (l *GetUserLikesLogic) GetUserLikes(in *like.GetUserLikesRequest) (*like.GetUserLikesResponse, error) {
-	// todo: add your logic here and delete this line
+	// 1、查询缓存
+	key := model.GetLikeRecordKey("short_video", in.UserId)
 
 	return &like.GetUserLikesResponse{}, nil
 }

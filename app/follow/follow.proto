@@ -3,14 +3,58 @@ syntax = "proto3";
 package follow;
 option go_package="./follow";
 
-message Request {
-  string ping = 1;
-}
 
-message Response {
-  string pong = 1;
-}
-
+// 服务定义
 service Follow {
-  rpc Ping(Request) returns(Response);
+  rpc CheckService(PingRequest) returns(PingResponse);  // 检查服务状态
+  rpc FollowAction(FollowActionRequest) returns(FollowActionResponse);
+  rpc ListFollowing(GetFollowListRequest) returns(GetFollowListResponse);  // 获取关注列表
+  rpc ListFollowers(GetFollowerListRequest) returns(GetFollowerListResponse);  // 获取粉丝列表
+}
+
+// 消息定义
+
+message PingRequest {
+  // 如果没有特定的数据要发送，则不需要字段
+}
+
+message PingResponse {
+  bool service_available = 1;  // 服务是否可用
+}
+
+message FollowActionRequest {
+  int64 follower_id = 1;  // 关注者的ID，必须是一个正数
+  int64 followee_id = 2;  // 被关注者的ID，必须是一个正数
+  enum ActionType {
+    UNKNOWN = 0;
+    FOLLOW = 1;
+    UNFOLLOW = 2;
+  }
+  ActionType action_type = 3;  // 要执行的动作类型
+}
+
+message FollowActionResponse {
+  bool success = 1;  // 操作是否成功
+}
+
+message GetFollowListRequest {
+  int64 user_id = 1;  // 请求其关注列表的用户的ID
+  int64 cursor = 2;  // 游标
+  int64 page_size = 3;  // 每页大小
+}
+
+message GetFollowListResponse {
+  repeated int64 followee_ids = 1;  // 用户关注的用户ID列表
+  int64 total_count = 2;  // 总关注数
+}
+
+message GetFollowerListRequest {
+  int64 user_id = 1;  // 请求其粉丝列表的用户的ID
+  int64 cursor = 2;  // 游标
+  int64 page_size = 3;  // 每页大小
+}
+
+message GetFollowerListResponse {
+  repeated int64 follower_ids = 1;  // 关注该用户的用户ID列表
+  int64 total_count = 2;  // 总粉丝数
 }

@@ -1,4 +1,4 @@
-package minio
+package oss
 
 import (
 	"github.com/minio/minio-go/v7"
@@ -19,7 +19,7 @@ func InitMinio(c *Conf) *minio.Client {
 		Secure: c.UseSSL,
 	})
 	if err != nil {
-		log.Fatalf("minio connect error: %v\n", err)
+		log.Fatalf("oss connect error: %v\n", err)
 	}
 	return client
 }

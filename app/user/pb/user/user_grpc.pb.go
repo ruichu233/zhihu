@@ -25,6 +25,7 @@ const (
 	User_GetUserInfo_FullMethodName         = "/user.User/GetUserInfo"
 	User_GetUserFollowerList_FullMethodName = "/user.User/GetUserFollowerList"
 	User_GetUserFollowedList_FullMethodName = "/user.User/GetUserFollowedList"
+	User_SendVerifyCode_FullMethodName      = "/user.User/SendVerifyCode"
 )
 
 // UserClient is the client API for User service.
@@ -37,6 +38,7 @@ type UserClient interface {
 	GetUserInfo(ctx context.Context, in *UserInfoRequest, opts ...grpc.CallOption) (*UserInfoResponse, error)
 	GetUserFollowerList(ctx context.Context, in *FollowerListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error)
 	GetUserFollowedList(ctx context.Context, in *FollowedListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error)
+	SendVerifyCode(ctx context.Context, in *SendVerifyCodeRequest, opts ...grpc.CallOption) (*SendVerifyCodeResponse, error)
 }
 
 type userClient struct {
@@ -107,6 +109,16 @@ func (c *userClient) GetUserFollowedList(ctx context.Context, in *FollowedListRe
 	return out, nil
 }
 
+func (c *userClient) SendVerifyCode(ctx context.Context, in *SendVerifyCodeRequest, opts ...grpc.CallOption) (*SendVerifyCodeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SendVerifyCodeResponse)
+	err := c.cc.Invoke(ctx, User_SendVerifyCode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility.
@@ -117,6 +129,7 @@ type UserServer interface {
 	GetUserInfo(context.Context, *UserInfoRequest) (*UserInfoResponse, error)
 	GetUserFollowerList(context.Context, *FollowerListRequest) (*FollowerListResponse, error)
 	GetUserFollowedList(context.Context, *FollowedListRequest) (*FollowerListResponse, error)
+	SendVerifyCode(context.Context, *SendVerifyCodeRequest) (*SendVerifyCodeResponse, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -144,6 +157,9 @@ func (UnimplementedUserServer) GetUserFollowerList(context.Context, *FollowerLis
 }
 func (UnimplementedUserServer) GetUserFollowedList(context.Context, *FollowedListRequest) (*FollowerListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserFollowedList not implemented")
+}
+func (UnimplementedUserServer) SendVerifyCode(context.Context, *SendVerifyCodeRequest) (*SendVerifyCodeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendVerifyCode not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 func (UnimplementedUserServer) testEmbeddedByValue()              {}
@@ -274,6 +290,24 @@ func _User_GetUserFollowedList_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_SendVerifyCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendVerifyCodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).SendVerifyCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_SendVerifyCode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).SendVerifyCode(ctx, req.(*SendVerifyCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -304,6 +338,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserFollowedList",
 			Handler:    _User_GetUserFollowedList_Handler,
+		},
+		{
+			MethodName: "SendVerifyCode",
+			Handler:    _User_SendVerifyCode_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

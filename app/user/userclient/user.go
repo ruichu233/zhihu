@@ -13,20 +13,22 @@ import (
 )
 
 type (
-	FindByEmailRequest   = user.FindByEmailRequest
-	FindByEmailResponse  = user.FindByEmailResponse
-	FollowedListRequest  = user.FollowedListRequest
-	FollowedListResponse = user.FollowedListResponse
-	FollowerListRequest  = user.FollowerListRequest
-	FollowerListResponse = user.FollowerListResponse
-	LoginRequest         = user.LoginRequest
-	LoginResponse        = user.LoginResponse
-	RegisterRequest      = user.RegisterRequest
-	RegisterResponse     = user.RegisterResponse
-	Request              = user.Request
-	Response             = user.Response
-	UserInfoRequest      = user.UserInfoRequest
-	UserInfoResponse     = user.UserInfoResponse
+	FindByEmailRequest     = user.FindByEmailRequest
+	FindByEmailResponse    = user.FindByEmailResponse
+	FollowedListRequest    = user.FollowedListRequest
+	FollowedListResponse   = user.FollowedListResponse
+	FollowerListRequest    = user.FollowerListRequest
+	FollowerListResponse   = user.FollowerListResponse
+	LoginRequest           = user.LoginRequest
+	LoginResponse          = user.LoginResponse
+	RegisterRequest        = user.RegisterRequest
+	RegisterResponse       = user.RegisterResponse
+	Request                = user.Request
+	Response               = user.Response
+	SendVerifyCodeRequest  = user.SendVerifyCodeRequest
+	SendVerifyCodeResponse = user.SendVerifyCodeResponse
+	UserInfoRequest        = user.UserInfoRequest
+	UserInfoResponse       = user.UserInfoResponse
 
 	User interface {
 		Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
@@ -35,6 +37,7 @@ type (
 		GetUserInfo(ctx context.Context, in *UserInfoRequest, opts ...grpc.CallOption) (*UserInfoResponse, error)
 		GetUserFollowerList(ctx context.Context, in *FollowerListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error)
 		GetUserFollowedList(ctx context.Context, in *FollowedListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error)
+		SendVerifyCode(ctx context.Context, in *SendVerifyCodeRequest, opts ...grpc.CallOption) (*SendVerifyCodeResponse, error)
 	}
 
 	defaultUser struct {
@@ -76,4 +79,9 @@ func (m *defaultUser) GetUserFollowerList(ctx context.Context, in *FollowerListR
 func (m *defaultUser) GetUserFollowedList(ctx context.Context, in *FollowedListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.GetUserFollowedList(ctx, in, opts...)
+}
+
+func (m *defaultUser) SendVerifyCode(ctx context.Context, in *SendVerifyCodeRequest, opts ...grpc.CallOption) (*SendVerifyCodeResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.SendVerifyCode(ctx, in, opts...)
 }

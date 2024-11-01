@@ -38,7 +38,7 @@ func (l *FindByEmailLogic) FindByEmail(in *user.FindByEmailRequest) (*user.FindB
 	return &user.FindByEmailResponse{
 		UserId:   users.Id,
 		Email:    users.Email,
-		Username: users.UserName,
+		Username: users.Username,
 		Password: users.Password,
 	}, nil
 }

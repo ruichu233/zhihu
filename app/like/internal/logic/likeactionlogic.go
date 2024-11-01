@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/redis/go-redis/v9"
+	"gorm.io/gorm"
 	"time"
 	"zhihu/app/like/internal/svc"
 	"zhihu/app/like/model"
@@ -31,7 +32,7 @@ func NewLikeActionLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LikeAc
 
 func (l *LikeActionLogic) LikeAction(in *like.LikeActionRequest) (*like.LikeActionResponse, error) {
 	// 1、获取当前用户对目标是否点赞
-	isLike, err := l.IsLike(in.BizId, in.UserId, in.ObjId)
+	isLike, err := IsLike(l.ctx, l.svcCtx.RDB, l.svcCtx.DB, in.BizId, in.UserId, in.ObjId)
 	if err != nil {
 		return nil, err
 	}
@@ -75,11 +76,11 @@ func (l *LikeActionLogic) LikeAction(in *like.LikeActionRequest) (*like.LikeActi
 }
 
 // IsLike 查询是否对单个obj点过赞
-func (l *LikeActionLogic) IsLike(bizId string, userId, objId int64) (bool, error) {
+func IsLike(ctx context.Context, rdb *redis.Client, db *gorm.DB, bizId string, userId, objId int64) (bool, error) {
 	// 1、从缓存在获取当前用户对目标是否点赞
 	key := model.GetLikeRecordKey(bizId, userId)
 	member := fmt.Sprintf("%d", objId)
-	exists, err := ExistsInSortedSet(l.ctx, l.svcCtx.RDB, key, member)
+	exists, err := ExistsInSortedSet(ctx, rdb, key, member)
 	if err != nil {
 		return false, err
 	}
@@ -88,7 +89,7 @@ func (l *LikeActionLogic) IsLike(bizId string, userId, objId int64) (bool, error
 	}
 	// 2、查询数据库获取当前用户对目标是否点赞
 	var likeRecord model.LikeRecord
-	err = l.svcCtx.DB.Model(&model.LikeRecord{}).Unscoped().Where("obj_id = ? and biz_id = ? and user_id = ?", objId, bizId, userId).Limit(1).Find(&likeRecord).Error
+	err = db.Model(&model.LikeRecord{}).Unscoped().Where("obj_id = ? and biz_id = ? and user_id = ?", objId, bizId, userId).Limit(1).Find(&likeRecord).Error
 	if err != nil {
 		return false, err
 	}
@@ -99,7 +100,7 @@ func (l *LikeActionLogic) IsLike(bizId string, userId, objId int64) (bool, error
 		return false, nil
 	}
 	// 3、更新缓存
-	l.svcCtx.RDB.ZAdd(l.ctx, key, redis.Z{
+	rdb.ZAdd(ctx, key, redis.Z{
 		Member: member,
 		Score:  float64(time.Now().Unix()),
 	})

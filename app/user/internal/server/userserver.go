@@ -51,3 +51,8 @@ func (s *UserServer) GetUserFollowedList(ctx context.Context, in *user.FollowedL
 	l := logic.NewGetUserFollowedListLogic(ctx, s.svcCtx)
 	return l.GetUserFollowedList(in)
 }
+
+func (s *UserServer) SendVerifyCode(ctx context.Context, in *user.SendVerifyCodeRequest) (*user.SendVerifyCodeResponse, error) {
+	l := logic.NewSendVerifyCodeLogic(ctx, s.svcCtx)
+	return l.SendVerifyCode(in)
+}

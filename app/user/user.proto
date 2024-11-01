@@ -11,6 +11,7 @@ service User {
   rpc GetUserInfo(UserInfoRequest) returns(UserInfoResponse);
   rpc GetUserFollowerList(FollowerListRequest) returns(FollowerListResponse);
   rpc GetUserFollowedList(FollowedListRequest) returns(FollowerListResponse);
+  rpc SendVerifyCode(SendVerifyCodeRequest) returns(SendVerifyCodeResponse);
 }
 
 message Request {
@@ -78,3 +79,9 @@ message FindByEmailResponse {
   string email = 4;
 }
 
+message SendVerifyCodeRequest {
+  string email = 1;
+}
+message SendVerifyCodeResponse {
+  string code = 1;
+}

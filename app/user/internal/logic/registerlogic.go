@@ -40,7 +40,7 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 		return nil, errors.New("邮箱已注册")
 	}
 	// 2、检查验证码是否过期
-	result, err := l.svcCtx.RDB.Exists(l.ctx, in.Code).Result()
+	result, err := l.svcCtx.RDB.Exists(l.ctx, in.Email).Result()
 	if err != nil {
 		return nil, err
 	}
@@ -56,11 +56,12 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 	if code != in.Code {
 		return nil, errors.New("验证码不正确")
 	}
+	l.svcCtx.RDB.Del(l.ctx, in.Email)
 	// 4、注册用户
 	u.Id = idgen.NextId()
 	u.Email = in.Email
 	u.Password = utils.Md5Crypt(in.Password)
-	u.UserName = in.Username
+	u.Username = in.Username
 	err = l.svcCtx.DB.Model(&model.User{}).Create(&u).Error
 	if err != nil {
 		return nil, err

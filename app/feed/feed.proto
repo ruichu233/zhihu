@@ -11,6 +11,55 @@ message Response {
   string pong = 1;
 }
 
+// Feed 服务
 service Feed {
   rpc Ping(Request) returns(Response);
+  // 获取推荐内容列表
+  rpc GetFeed (GetFeedRequest) returns (GetFeedResponse);
+
+  // 获取关注者的最新作品列表
+  rpc GetFollowedCreatorsFeed (GetFollowedCreatorsFeedRequest) returns (GetFollowedCreatorsFeedResponse);
+}
+
+// 请求体，用于获取推荐内容列表
+message GetFeedRequest {
+  string user_id = 1;       // 用户 ID，用于个性化推荐
+  string cursor = 2;        // 游标，用于定位分页
+  int32 page_size = 3;      // 每页大小
+  string sort_by = 4;       // 排序方式，例如：最新发布、最受欢迎等
+  map<string, string> filters = 5;  // 其他可选过滤条件
+}
+
+// 响应体，返回推荐内容列表
+message GetFeedResponse {
+  repeated FeedItem items = 1; // 推荐的内容列表
+  string next_cursor = 2;      // 下一页游标
+  bool has_more = 3;           // 是否有更多内容
+}
+
+// 获取关注者作品的请求体
+message GetFollowedCreatorsFeedRequest {
+  string user_id = 1;        // 用户 ID
+  string cursor = 2;         // 游标，用于定位分页
+  int32 page_size = 3;       // 每页大小
+}
+
+// 获取关注者作品的响应体
+message GetFollowedCreatorsFeedResponse {
+  repeated FeedItem items = 1; // 关注者的最新作品列表
+  string next_cursor = 2;      // 下一页游标
+  bool has_more = 3;           // 是否有更多内容
+}
+
+// 单个 Feed 项的定义
+message FeedItem {
+  string content_id = 1;       // 内容 ID
+  string title = 2;            // 内容标题
+  string description = 3;      // 内容描述
+  string content_type = 4;     // 内容类型（例如视频、文章、图片等）
+  string creator_id = 5;       // 内容创作者的用户 ID
+  string creator_name = 6;     // 内容创作者的名字
+  string thumbnail_url = 7;    // 缩略图 URL
+  int64 publish_timestamp = 8; // 发布时间
+  map<string, string> metadata = 9; // 额外的元数据
 }

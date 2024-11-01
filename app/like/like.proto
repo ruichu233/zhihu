@@ -61,11 +61,11 @@ message GetPostLikeCountRequest {
 }
 
 message GetPostLikeCountResponse {
-  int32 count = 1;
+  int64 count = 1;
 }
 
 message GetUserLikesRequest {
-  string user_id = 1;
+  int64 user_id = 1;
 }
 
 message GetUserLikesResponse {
@@ -78,13 +78,13 @@ message GetPostLikersRequest {
 }
 
 message GetPostLikersResponse {
-  repeated string user_ids = 1;
+  repeated int64 user_ids = 1;
 }
 
 message GetUserTotalLikesRequest {
-  string user_id = 1;
+  int64 user_id = 1;
 }
 
 message GetUserTotalLikesResponse {
-  int32 total_likes = 1;
+  int64 total_likes = 1;
 }

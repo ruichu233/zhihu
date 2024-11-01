@@ -4,12 +4,11 @@ import (
 	"context"
 	"errors"
 	"strconv"
+	"zhihu/app/user/internal/svc"
 	"zhihu/app/user/model"
+	"zhihu/app/user/pb/user"
 	"zhihu/pkg/token"
 	"zhihu/pkg/utils"
-
-	"zhihu/app/user/internal/svc"
-	"zhihu/app/user/pb/user"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -37,7 +36,7 @@ func (l *LoginLogic) Login(in *user.LoginRequest) (*user.LoginResponse, error) {
 	}
 
 	// 2、检查密码是否正确
-	if utils.Md5Crypt(u.Password) != in.Password {
+	if u.Password != utils.Md5Crypt(in.Password) {
 		return nil, errors.New("密码错误")
 	}
 	// 3、生成token
