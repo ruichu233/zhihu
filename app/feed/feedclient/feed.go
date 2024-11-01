@@ -6,18 +6,35 @@ package feedclient
 import (
 	"context"
 
-	"zhihu/app/feed/feed"
+	"zhihu/app/feed/pb/feed"
 
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
 )
 
 type (
-	Request  = feed.Request
-	Response = feed.Response
+	FeedItem                   = feed.FeedItem
+	GetFollowerFeedRequest     = feed.GetFollowerFeedRequest
+	GetFollowerFeedResponse    = feed.GetFollowerFeedResponse
+	GetRecommendedFeedRequest  = feed.GetRecommendedFeedRequest
+	GetRecommendedFeedResponse = feed.GetRecommendedFeedResponse
+	PublishContentRequest      = feed.PublishContentRequest
+	PublishContentResponse     = feed.PublishContentResponse
+	Request                    = feed.Request
+	Response                   = feed.Response
+	UnfollowRequest            = feed.UnfollowRequest
+	UnfollowResponse           = feed.UnfollowResponse
 
 	Feed interface {
 		Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+		// 获取关注者的 Feed
+		GetFollowerFeed(ctx context.Context, in *GetFollowerFeedRequest, opts ...grpc.CallOption) (*GetFollowerFeedResponse, error)
+		// 获取个性化推荐 Feed
+		GetRecommendedFeed(ctx context.Context, in *GetRecommendedFeedRequest, opts ...grpc.CallOption) (*GetRecommendedFeedResponse, error)
+		// 当创作者发布新内容时，推送内容发布事件
+		PublishContent(ctx context.Context, in *PublishContentRequest, opts ...grpc.CallOption) (*PublishContentResponse, error)
+		// 取消关注
+		Unfollow(ctx context.Context, in *UnfollowRequest, opts ...grpc.CallOption) (*UnfollowResponse, error)
 	}
 
 	defaultFeed struct {
@@ -34,4 +51,28 @@ func NewFeed(cli zrpc.Client) Feed {
 func (m *defaultFeed) Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
 	client := feed.NewFeedClient(m.cli.Conn())
 	return client.Ping(ctx, in, opts...)
+}
+
+// 获取关注者的 Feed
+func (m *defaultFeed) GetFollowerFeed(ctx context.Context, in *GetFollowerFeedRequest, opts ...grpc.CallOption) (*GetFollowerFeedResponse, error) {
+	client := feed.NewFeedClient(m.cli.Conn())
+	return client.GetFollowerFeed(ctx, in, opts...)
+}
+
+// 获取个性化推荐 Feed
+func (m *defaultFeed) GetRecommendedFeed(ctx context.Context, in *GetRecommendedFeedRequest, opts ...grpc.CallOption) (*GetRecommendedFeedResponse, error) {
+	client := feed.NewFeedClient(m.cli.Conn())
+	return client.GetRecommendedFeed(ctx, in, opts...)
+}
+
+// 当创作者发布新内容时，推送内容发布事件
+func (m *defaultFeed) PublishContent(ctx context.Context, in *PublishContentRequest, opts ...grpc.CallOption) (*PublishContentResponse, error) {
+	client := feed.NewFeedClient(m.cli.Conn())
+	return client.PublishContent(ctx, in, opts...)
+}
+
+// 取消关注
+func (m *defaultFeed) Unfollow(ctx context.Context, in *UnfollowRequest, opts ...grpc.CallOption) (*UnfollowResponse, error) {
+	client := feed.NewFeedClient(m.cli.Conn())
+	return client.Unfollow(ctx, in, opts...)
 }

@@ -6,9 +6,9 @@ package server
 import (
 	"context"
 
-	"zhihu/app/feed/feed"
 	"zhihu/app/feed/internal/logic"
 	"zhihu/app/feed/internal/svc"
+	"zhihu/app/feed/pb/feed"
 )
 
 type FeedServer struct {
@@ -25,4 +25,28 @@ func NewFeedServer(svcCtx *svc.ServiceContext) *FeedServer {
 func (s *FeedServer) Ping(ctx context.Context, in *feed.Request) (*feed.Response, error) {
 	l := logic.NewPingLogic(ctx, s.svcCtx)
 	return l.Ping(in)
+}
+
+// 获取关注者的 Feed
+func (s *FeedServer) GetFollowerFeed(ctx context.Context, in *feed.GetFollowerFeedRequest) (*feed.GetFollowerFeedResponse, error) {
+	l := logic.NewGetFollowerFeedLogic(ctx, s.svcCtx)
+	return l.GetFollowerFeed(in)
+}
+
+// 获取个性化推荐 Feed
+func (s *FeedServer) GetRecommendedFeed(ctx context.Context, in *feed.GetRecommendedFeedRequest) (*feed.GetRecommendedFeedResponse, error) {
+	l := logic.NewGetRecommendedFeedLogic(ctx, s.svcCtx)
+	return l.GetRecommendedFeed(in)
+}
+
+// 当创作者发布新内容时，推送内容发布事件
+func (s *FeedServer) PublishContent(ctx context.Context, in *feed.PublishContentRequest) (*feed.PublishContentResponse, error) {
+	l := logic.NewPublishContentLogic(ctx, s.svcCtx)
+	return l.PublishContent(in)
+}
+
+// 取消关注
+func (s *FeedServer) Unfollow(ctx context.Context, in *feed.UnfollowRequest) (*feed.UnfollowResponse, error) {
+	l := logic.NewUnfollowLogic(ctx, s.svcCtx)
+	return l.Unfollow(in)
 }

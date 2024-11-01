@@ -9,22 +9,23 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type PingLogic struct {
+type UnfollowLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewPingLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PingLogic {
-	return &PingLogic{
+func NewUnfollowLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UnfollowLogic {
+	return &UnfollowLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *PingLogic) Ping(in *feed.Request) (*feed.Response, error) {
+// 取消关注
+func (l *UnfollowLogic) Unfollow(in *feed.UnfollowRequest) (*feed.UnfollowResponse, error) {
 	// todo: add your logic here and delete this line
 
-	return &feed.Response{}, nil
+	return &feed.UnfollowResponse{}, nil
 }

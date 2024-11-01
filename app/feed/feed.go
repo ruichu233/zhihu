@@ -4,10 +4,10 @@ import (
 	"flag"
 	"fmt"
 
-	"zhihu/app/feed/feed"
 	"zhihu/app/feed/internal/config"
 	"zhihu/app/feed/internal/server"
 	"zhihu/app/feed/internal/svc"
+	"zhihu/app/feed/pb/feed"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
