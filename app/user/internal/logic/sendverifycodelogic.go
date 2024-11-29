@@ -42,9 +42,7 @@ func (l *SendVerifyCodeLogic) SendVerifyCode(in *user.SendVerifyCodeRequest) (*u
 	if !result {
 		return nil, fmt.Errorf("验证码已存在")
 	}
-	return &user.SendVerifyCodeResponse{
-		Code: code,
-	}, nil
+	return &user.SendVerifyCodeResponse{}, nil
 }
 
 // 生成随机验证码

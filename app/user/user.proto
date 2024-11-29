@@ -83,5 +83,4 @@ message SendVerifyCodeRequest {
   string email = 1;
 }
 message SendVerifyCodeResponse {
-  string code = 1;
 }
