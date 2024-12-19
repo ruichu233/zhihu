@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"strconv"
+	"time"
 
 	"zhihu/app/like/internal/svc"
 	"zhihu/app/like/model"
@@ -46,7 +47,10 @@ func (l *GetPostLikeCountLogic) GetPostLikeCount(in *like.GetPostLikeCountReques
 	if tx.Error != nil {
 		return nil, err
 	}
+	// 缓存中更新数据
+	l.svcCtx.RDB.Set(l.ctx, key, likeCount.LikeNum, 60*time.Minute)
+
 	return &like.GetPostLikeCountResponse{
-		Count: likeCount,
+		Count: likeCount.LikeNum,
 	}, nil
 }

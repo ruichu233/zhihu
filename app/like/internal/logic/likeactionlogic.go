@@ -54,7 +54,7 @@ func (l *LikeActionLogic) LikeAction(in *like.LikeActionRequest) (*like.LikeActi
 			}
 			// 3、更新缓存
 			l.svcCtx.RDB.ZAdd(l.ctx, model.GetLikeRecordKey(in.BizId, in.UserId), redis.Z{
-				Member: fmt.Sprintf("%d", in.ObjId),
+				Member: in.ObjId,
 				Score:  float64(time.Now().Unix()),
 			})
 		}

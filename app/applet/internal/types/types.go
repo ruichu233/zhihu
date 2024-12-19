@@ -24,6 +24,18 @@ type EmailRegisterResponse struct {
 	AccessToken string `json:"token"`
 }
 
+type LikeVideoRequest struct {
+	ActionType string `json:"action_type"`
+	BizId      string `json:"biz_id"`
+	UserId     int64  `json:"user_id"` // 用户ID
+	ObjId      int64  `path:"obj_id"`  // 对象ID
+}
+
+type UploadUrlResponse struct {
+	VideoUrl string `json:"video_url"`
+	CoverUrl string `json:"cover_url"`
+}
+
 type UserInfoResponse struct {
 	UserId   int64  `json:"user_id"`
 	UserName string `json:"name"`

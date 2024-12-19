@@ -33,12 +33,25 @@ services:
       - ETCD_ADVERTISE_CLIENT_URLS=http://0.0.0.0:2379
       - ETCD_API=3
       - ALLOW_NONE_AUTHENTICATION=yes
-
     volumes:
       - etcd-data:/etcd-data
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: "minioadmin"           # 用户名
+      MINIO_ROOT_PASSWORD: "minioadmin123"     # 密码
+    ports:
+      - "9000:9000"   # MinIO 对象存储端口
+      - "9001:9001"   # MinIO 控制台端口
+    command: server /data --console-address ':9001'   #指定容器中的目录 /data
+    volumes:
+      - minio-data:/data
     restart: unless-stopped
 
 volumes:
   mysql-data:
   redis-data:
   etcd-data:
+  minio-data:

@@ -15,6 +15,8 @@ import (
 type (
 	FollowActionRequest     = follow.FollowActionRequest
 	FollowActionResponse    = follow.FollowActionResponse
+	FollowItem              = follow.FollowItem
+	FollowerItem            = follow.FollowerItem
 	GetFollowListRequest    = follow.GetFollowListRequest
 	GetFollowListResponse   = follow.GetFollowListResponse
 	GetFollowerListRequest  = follow.GetFollowerListRequest

@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log"
 	"net/http"
 	"zhihu/pkg/token"
 )
@@ -23,9 +24,10 @@ func (m *AuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			next(w, r)
 			return
 		}
-		payload, err := token.Parse(accessToken, "")
+		payload, err := token.Parse(accessToken, "Rtg8BPKNEf2mB4mgvKONGPZZQSaJWNLijxR42qRgq0iBb5")
 		if err != nil {
 			// todo 过期token更新
+			log.Printf("err:%v", err)
 			next(w, r)
 			return
 		}

@@ -5,9 +5,20 @@ option go_package="./video";
 
 
 service video {
+  // 获取视频上传的预签名 URL
+  rpc GetUploadURL(GetUploadURLRequest) returns (GetUploadURLResponse);
   rpc Publish(PublishRequest) returns(PublishResponse);
   rpc Detail(DetailRequest) returns(DetailResponse);
 }
+message GetUploadURLRequest {
+  string filename = 1; // 客户端希望上传的文件名
+}
+
+message GetUploadURLResponse {
+  string video_url = 1;      // 用于视频上传的预签名 URL
+  string cover_url = 2;      // 视频封面的预签名 URL
+}
+
 message PublishRequest {
   int64 author_id = 1;
   string video_url = 2;

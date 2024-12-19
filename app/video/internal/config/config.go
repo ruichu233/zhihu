@@ -9,9 +9,8 @@ import (
 
 type Config struct {
 	zrpc.RpcServerConf
-	DBConf         db.Conf
-	RDBConf        rdb.Conf
-	OSSConf        oss.Conf
-	UserClientConf zrpc.RpcClientConf
-	WorkId         uint16
+	DBConf  db.Conf
+	RDBConf rdb.Conf
+	OSSConf oss.Conf
+	WorkId  uint16
 }

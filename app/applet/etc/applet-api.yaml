@@ -1,6 +1,6 @@
 Name: applet-api
-Host: 0.0.0.0
-Port: 8888
+Host: 127.0.0.1
+Port: 8080
 
 db:
   Host: 127.0.0.1
@@ -14,3 +14,5 @@ rdb:
   Addr: 127.0.0.1:6379
   Password:
   Db: 0
+
+AuthKey: '123456'

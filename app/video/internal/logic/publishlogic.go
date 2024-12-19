@@ -28,7 +28,7 @@ func NewPublishLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PublishLo
 
 func (l *PublishLogic) Publish(in *video.PublishRequest) (*video.PublishResponse, error) {
 	videoId := idgen.NextId()
-	videos := model.Videos{
+	videos := model.Video{
 		BaseModel: model.BaseModel{
 			Id: videoId,
 		},
@@ -39,24 +39,24 @@ func (l *PublishLogic) Publish(in *video.PublishRequest) (*video.PublishResponse
 		AuthorId:    in.AuthorId,
 		CommentNum:  0,
 		LikeNum:     0,
-		TagIds:      nil,
+		TagIds:      in.TagIds,
 	}
 	if err := l.svcCtx.DB.Session(&gorm.Session{}).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Model(&model.Videos{}).Create(&videos).Error; err != nil {
+		// 保存视频信息
+		if err := tx.Model(&model.Video{}).Create(&videos).Error; err != nil {
+			return err
+		}
+		// 向 feed 服务发送消息
+		_, err := l.svcCtx.FeedRPC.PublishContent(l.ctx, &feed.PublishContentRequest{
+			UserId:                in.AuthorId,
+			VideoId:               videoId,
+			VideoCreatorTimestamp: videos.CreatedAt.Unix(),
+		})
+		if err != nil {
 			return err
 		}
 		return nil
 	}); err != nil {
-		return nil, err
-	}
-
-	// 向 feed 服务发送消息
-	_, err := l.svcCtx.FeedRPC.PublishContent(l.ctx, &feed.PublishContentRequest{
-		UserId:                in.AuthorId,
-		VideoId:               videoId,
-		VideoCreatorTimestamp: videos.CreatedAt.Unix(),
-	})
-	if err != nil {
 		return nil, err
 	}
 	return &video.PublishResponse{VideoId: videoId}, nil

@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/redis/go-redis/v9"
 	"zhihu/app/feed/internal/svc"
@@ -27,7 +28,9 @@ func NewPublishContentLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Pu
 
 // 当创作者发布新内容时，推送内容发布事件
 func (l *PublishContentLogic) PublishContent(in *feed.PublishContentRequest) (*feed.PublishContentResponse, error) {
-	l.svcCtx.RDB.ZAdd(l.ctx, GetCacheKey(in.UserId), redis.Z{
+	rdb := l.svcCtx.RDB
+
+	rdb.ZAdd(l.ctx, GetCacheKey(in.UserId), redis.Z{
 		Score:  float64(in.VideoCreatorTimestamp),
 		Member: in.VideoId,
 	})
@@ -58,4 +61,18 @@ func (l *PublishContentLogic) PublishContent(in *feed.PublishContentRequest) (*f
 
 func GetCacheKey(userId int64) string {
 	return fmt.Sprintf("FEED_CONTENT_%d", userId)
+}
+
+// 检查是否还有更多数据
+func checkNoMoreFlag(ctx context.Context, rdb *redis.Client, sortedSetKey string) (bool, error) {
+	// 检查 `NoMore` 标志是否在 SortedSet 中
+	noMoreExists, err := rdb.ZScore(ctx, sortedSetKey, "NoMore").Result()
+	if err != nil {
+		// 如果返回 redis.Nil，表示 NoMore 标志不存在，返回 false
+		if errors.Is(err, redis.Nil) {
+			return false, nil
+		}
+		return false, err
+	}
+	return noMoreExists > 0, nil
 }

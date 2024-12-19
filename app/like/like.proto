@@ -69,7 +69,7 @@ message GetUserLikesRequest {
 }
 
 message GetUserLikesResponse {
-  repeated string post_ids = 1;
+  repeated int64 post_ids = 1;
 }
 
 message GetPostLikersRequest {

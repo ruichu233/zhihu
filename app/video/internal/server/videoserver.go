@@ -22,6 +22,12 @@ func NewVideoServer(svcCtx *svc.ServiceContext) *VideoServer {
 	}
 }
 
+// 获取视频上传的预签名 URL
+func (s *VideoServer) GetUploadURL(ctx context.Context, in *video.GetUploadURLRequest) (*video.GetUploadURLResponse, error) {
+	l := logic.NewGetUploadURLLogic(ctx, s.svcCtx)
+	return l.GetUploadURL(in)
+}
+
 func (s *VideoServer) Publish(ctx context.Context, in *video.PublishRequest) (*video.PublishResponse, error) {
 	l := logic.NewPublishLogic(ctx, s.svcCtx)
 	return l.Publish(in)

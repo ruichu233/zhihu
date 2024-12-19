@@ -29,30 +29,29 @@ service Feed {
 
 // 拉取关注者 Feed 的请求
 message GetFollowerFeedRequest {
-  string user_id = 1;          // 用户 ID
-  string cursor = 2;           // 游标，用于分页拉取
-  int32 page_size = 3;         // 每页大小
+  int64 user_id = 1;          // 用户 ID
+  int64 cursor = 2;           // 游标，用于分页拉取
+  int64 page_size = 3;         // 每页大小
 }
 
 // 拉取关注者 Feed 的响应
 message GetFollowerFeedResponse {
-  repeated FeedItem items = 1; // 关注者的最新作品列表
-  repeated FeedItem recommended_items = 2; // 推荐内容
-  string next_cursor = 3;      // 下一页的游标
+  repeated int64 items = 1; // 关注者的最新作品列表
+  int64 next_cursor = 2;      // 下一页的游标
   bool has_more = 4;           // 是否还有更多内容
 }
 
 // 拉取推荐 Feed 的请求
 message GetRecommendedFeedRequest {
-  string user_id = 1;          // 用户 ID
-  string cursor = 2;           // 游标，用于分页拉取
-  int32 page_size = 3;         // 每页大小
+  int64 user_id = 1;          // 用户 ID
+  int64 cursor = 2;           // 游标，用于分页拉取
+  int64 page_size = 3;         // 每页大小
 }
 
 // 拉取推荐 Feed 的响应
 message GetRecommendedFeedResponse {
-  repeated FeedItem recommended_items = 1; // 推荐的作品列表
-  string next_cursor = 2;      // 下一页的游标
+  repeated int64 recommended_items = 1; // 推荐的作品列表
+  int64 next_cursor = 2;      // 下一页的游标
   bool has_more = 3;           // 是否还有更多内容
 }
 
@@ -70,8 +69,8 @@ message PublishContentResponse {
 
 // 取消关注请求
 message UnfollowRequest {
-  string user_id = 1;          // 用户 ID
-  string creator_id = 2;       // 创作者 ID
+  int64 user_id = 1;          // 用户 ID
+  int64 creator_id = 2;       // 创作者 ID
 }
 
 // 取消关注响应
@@ -79,15 +78,3 @@ message UnfollowResponse {
   bool success = 1;            // 是否成功取消关注
 }
 
-// 单个 Feed 项定义
-message FeedItem {
-  string content_id = 1;       // 内容 ID
-  string title = 2;            // 内容标题
-  string description = 3;      // 内容描述
-  string content_type = 4;     // 内容类型
-  string creator_id = 5;       // 内容创作者的用户 ID
-  string creator_name = 6;     // 内容创作者的名字
-  string thumbnail_url = 7;    // 缩略图 URL
-  int64 publish_timestamp = 8; // 发布时间
-  map<string, string> metadata = 9; // 额外元数据
-}

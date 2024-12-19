@@ -6,6 +6,7 @@ import (
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/rest/httpx"
+	"net/http"
 	"zhihu/app/applet/internal/config"
 	"zhihu/app/applet/internal/handler"
 	"zhihu/app/applet/internal/svc"
@@ -21,9 +22,14 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 
-	server := rest.MustNewServer(c.RestConf)
+	server := rest.MustNewServer(c.RestConf, rest.WithCustomCors(func(header http.Header) {
+		header.Set("Access-Control-Allow-Origin", "*")
+		header.Add("Access-Control-Allow-Headers", "access-token")
+		header.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
+		header.Set("Access-Control-Expose-Headers", "Content-Length, Content-Type")
+	}, nil, "*"))
 	defer server.Stop()
-	token.Init(c.AuthKey, "applet")
+	token.Init(c.AuthKey, "identityKey")
 	ctx := svc.NewServiceContext(c)
 	handler.RegisterHandlers(server, ctx)
 

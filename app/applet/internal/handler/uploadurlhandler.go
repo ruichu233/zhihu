@@ -2,23 +2,23 @@ package handler
 
 import (
 	"net/http"
-	"zhihu/app/applet/internal/logic"
-	"zhihu/app/applet/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
+	"zhihu/app/applet/internal/logic"
+	"zhihu/app/applet/internal/svc"
 )
 
-func UserInfoHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func UploadUrlHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req struct {
-			UserId int64 `path:"user_id"`
+			Filename string `path:"filename"`
 		}
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
-		l := logic.NewUserInfoLogic(r.Context(), svcCtx)
-		resp, err := l.UserInfo(req.UserId)
+		l := logic.NewUploadUrlLogic(r.Context(), svcCtx)
+		resp, err := l.UploadUrl(req.Filename)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

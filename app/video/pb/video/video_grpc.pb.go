@@ -19,14 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Video_Publish_FullMethodName = "/video.video/Publish"
-	Video_Detail_FullMethodName  = "/video.video/Detail"
+	Video_GetUploadURL_FullMethodName = "/video.video/GetUploadURL"
+	Video_Publish_FullMethodName      = "/video.video/Publish"
+	Video_Detail_FullMethodName       = "/video.video/Detail"
 )
 
 // VideoClient is the client API for Video service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type VideoClient interface {
+	// 获取视频上传的预签名 URL
+	GetUploadURL(ctx context.Context, in *GetUploadURLRequest, opts ...grpc.CallOption) (*GetUploadURLResponse, error)
 	Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error)
 	Detail(ctx context.Context, in *DetailRequest, opts ...grpc.CallOption) (*DetailResponse, error)
 }
@@ -37,6 +40,16 @@ type videoClient struct {
 
 func NewVideoClient(cc grpc.ClientConnInterface) VideoClient {
 	return &videoClient{cc}
+}
+
+func (c *videoClient) GetUploadURL(ctx context.Context, in *GetUploadURLRequest, opts ...grpc.CallOption) (*GetUploadURLResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUploadURLResponse)
+	err := c.cc.Invoke(ctx, Video_GetUploadURL_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *videoClient) Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error) {
@@ -63,6 +76,8 @@ func (c *videoClient) Detail(ctx context.Context, in *DetailRequest, opts ...grp
 // All implementations must embed UnimplementedVideoServer
 // for forward compatibility.
 type VideoServer interface {
+	// 获取视频上传的预签名 URL
+	GetUploadURL(context.Context, *GetUploadURLRequest) (*GetUploadURLResponse, error)
 	Publish(context.Context, *PublishRequest) (*PublishResponse, error)
 	Detail(context.Context, *DetailRequest) (*DetailResponse, error)
 	mustEmbedUnimplementedVideoServer()
@@ -75,6 +90,9 @@ type VideoServer interface {
 // pointer dereference when methods are called.
 type UnimplementedVideoServer struct{}
 
+func (UnimplementedVideoServer) GetUploadURL(context.Context, *GetUploadURLRequest) (*GetUploadURLResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUploadURL not implemented")
+}
 func (UnimplementedVideoServer) Publish(context.Context, *PublishRequest) (*PublishResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Publish not implemented")
 }
@@ -100,6 +118,24 @@ func RegisterVideoServer(s grpc.ServiceRegistrar, srv VideoServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&Video_ServiceDesc, srv)
+}
+
+func _Video_GetUploadURL_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUploadURLRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServer).GetUploadURL(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Video_GetUploadURL_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServer).GetUploadURL(ctx, req.(*GetUploadURLRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Video_Publish_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -145,6 +181,10 @@ var Video_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "video.video",
 	HandlerType: (*VideoServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetUploadURL",
+			Handler:    _Video_GetUploadURL_Handler,
+		},
 		{
 			MethodName: "Publish",
 			Handler:    _Video_Publish_Handler,

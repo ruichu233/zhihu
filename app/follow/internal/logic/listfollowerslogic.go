@@ -24,14 +24,24 @@ func NewListFollowersLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Lis
 }
 
 func (l *ListFollowersLogic) ListFollowers(in *follow.GetFollowerListRequest) (*follow.GetFollowerListResponse, error) {
-	// 构建缓存键
-	Key := GetFollowKey(in.UserId)
-	// 查询缓存
+	if in.PageSize < 0 {
+		in.PageSize = 10
+	}
+	if in.Cursor < 0 {
+		in.Cursor = 0
+	}
+	var (
+		curPage []*follow.FollowerItem
+	)
 
+	// 构建缓存键
+	Key := GetFollowerKey(in.UserId)
+	// 查询缓存
+	err, followers := l.cacheFollowers(Key, in.Cursor, in.PageSize)
 	return &follow.GetFollowerListResponse{}, nil
 }
 
-func (l *ListFollowersLogic) cacheFollowers(followKey string) error {
+func (l *ListFollowersLogic) cacheFollowers(followKey string, cursor, ps int64) (error, []int64) {
 
 	return nil
 }

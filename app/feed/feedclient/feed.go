@@ -13,7 +13,6 @@ import (
 )
 
 type (
-	FeedItem                   = feed.FeedItem
 	GetFollowerFeedRequest     = feed.GetFollowerFeedRequest
 	GetFollowerFeedResponse    = feed.GetFollowerFeedResponse
 	GetRecommendedFeedRequest  = feed.GetRecommendedFeedRequest

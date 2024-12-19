@@ -141,5 +141,8 @@ func (l *FollowActionLogic) unfollowUser(followerId, followeeId int64, followKey
 }
 
 func GetFollowKey(followerId int64) string {
-	return fmt.Sprintf("follow_%d", followerId)
+	return fmt.Sprintf("following_%d", followerId)
+}
+func GetFollowerKey(followeeId int64) string {
+	return fmt.Sprintf("follower_%d", followeeId)
 }

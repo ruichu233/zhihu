@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"zhihu/app/user/userclient"
 
 	"zhihu/app/applet/internal/svc"
 	"zhihu/app/applet/internal/types"
@@ -24,6 +25,11 @@ func NewVerificationLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Veri
 }
 
 func (l *VerificationLogic) Verification(req *types.VerificationRequest) (resp *types.VerificationResponse, err error) {
-
-	return
+	_, err = l.svcCtx.UserRPC.SendVerifyCode(l.ctx, &userclient.SendVerifyCodeRequest{
+		Email: req.Email,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &types.VerificationResponse{}, nil
 }

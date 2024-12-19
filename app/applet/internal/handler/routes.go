@@ -45,4 +45,32 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		rest.WithSignature(serverCtx.Config.Signature),
 		rest.WithPrefix("/v1/user"),
 	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AuthMiddleware, serverCtx.MustLoginMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/:video_id/like",
+					Handler: LikeActionHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/v1/like"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AuthMiddleware, serverCtx.MustLoginMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/:filename",
+					Handler: UploadUrlHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/v1/video"),
+	)
 }

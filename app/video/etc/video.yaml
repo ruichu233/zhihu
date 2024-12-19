@@ -1,6 +1,26 @@
-Name: model.rpc
-ListenOn: 0.0.0.0:8080
+Name: video.rpc
+ListenOn: 127.0.0.1:8082
 Etcd:
   Hosts:
   - 127.0.0.1:2379
-  Key: model.rpc
+  Key: video.rpc
+DBConf:
+  user_name: root
+  password: "123456"
+  host: 127.0.0.1
+  port: "3306"
+  database: video
+  charset: utf8mb4
+
+RDBConf:
+  addr: 127.0.0.1:6379
+  password: ""
+  db: 0
+WorkId: 1
+
+OSSConf:
+  endpoint: "127.0.0.1:9000"
+  access_key: 0DITAOzIQbAdu26uSMPr
+  secret_key: Zg3T78ErnSEwdpjkNLjCpmTVu7zsYNeWKMrgsgsb
+  use_ssl: false
+

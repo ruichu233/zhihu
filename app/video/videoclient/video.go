@@ -13,13 +13,17 @@ import (
 )
 
 type (
-	DetailRequest   = video.DetailRequest
-	DetailResponse  = video.DetailResponse
-	PublishRequest  = video.PublishRequest
-	PublishResponse = video.PublishResponse
-	VideoFeed       = video.VideoFeed
+	DetailRequest        = video.DetailRequest
+	DetailResponse       = video.DetailResponse
+	GetUploadURLRequest  = video.GetUploadURLRequest
+	GetUploadURLResponse = video.GetUploadURLResponse
+	PublishRequest       = video.PublishRequest
+	PublishResponse      = video.PublishResponse
+	VideoFeed            = video.VideoFeed
 
 	Video interface {
+		// 获取视频上传的预签名 URL
+		GetUploadURL(ctx context.Context, in *GetUploadURLRequest, opts ...grpc.CallOption) (*GetUploadURLResponse, error)
 		Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error)
 		Detail(ctx context.Context, in *DetailRequest, opts ...grpc.CallOption) (*DetailResponse, error)
 	}
@@ -33,6 +37,12 @@ func NewVideo(cli zrpc.Client) Video {
 	return &defaultVideo{
 		cli: cli,
 	}
+}
+
+// 获取视频上传的预签名 URL
+func (m *defaultVideo) GetUploadURL(ctx context.Context, in *GetUploadURLRequest, opts ...grpc.CallOption) (*GetUploadURLResponse, error) {
+	client := video.NewVideoClient(m.cli.Conn())
+	return client.GetUploadURL(ctx, in, opts...)
 }
 
 func (m *defaultVideo) Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error) {
