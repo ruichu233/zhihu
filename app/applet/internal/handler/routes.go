@@ -69,6 +69,25 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Path:    "/:filename",
 					Handler: UploadUrlHandler(serverCtx),
 				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/publish",
+					Handler: PublishHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/v1/video"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AuthMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/video-list/:page/:cursor",
+					Handler: VideoListHandler(serverCtx),
+				},
 			}...,
 		),
 		rest.WithPrefix("/v1/video"),

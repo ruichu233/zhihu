@@ -70,18 +70,25 @@ service applet-api {
 type LikeActionRequest {
 	actionType string `json:"action_type"`
 	bizId      string `json:"biz_id"`
-	userId     int64  `json:"user_id"` // 用户ID
 	objId      int64  `path:"obj_id"` // 对象ID
+}
+
+type LikeActionResponse {
+	status string `json:"status"`
 }
 
 @server (
 	prefix:     /v1/video
 	middleware: AuthMiddleware,MustLoginMiddleware
 )
-// 获取上传视频的url
 service applet-api {
+	// 获取上传视频的url
 	@handler UploadUrlHandler
 	get /:filename returns (UploadUrlResponse)
+
+	// 上传视频记录
+	@handler PublishHandler
+	post /publish (PublishHandlerRequest) returns (PublishHandlerResponse)
 }
 
 type (
@@ -89,30 +96,50 @@ type (
 		VideoUrl string `json:"video_url"`
 		CoverUrl string `json:"cover_url"`
 	}
-)
-
-// 上传视频记录
-service applet-api {
-	@handler PublishHandler
-	post /publish (PublishHandlerRequest) returns (PublishHandlerResponse)
-}
-
-type (
 	PublishHandlerRequest {
-		AuthorId    int64   `json:"author_id"`
-		VideoId     int64   `json:"video_id"`
-		VideoUrl    string  `json:"video_url"`
-		CoverUrl    string  `json:"cover_url"`
-		Title       string  `json:"title"`
-		Description string  `json:"description"`
-		tag_ids     []int64 `json:"tag_ids"`
+		AuthorId    int64  `json:"author_id"`
+		VideoId     int64  `json:"video_id"`
+		VideoUrl    string `json:"video_url"`
+		CoverUrl    string `json:"cover_url"`
+		Title       string `json:"title"`
+		Description string `json:"description"`
 	}
 	PublishHandlerResponse {
 		VideoId int64 `json:"video_id"`
 	}
 )
 
-// 获取关注者视频
+@server (
+	prefix:     /v1/video
+	middleware: AuthMiddleware
+)
+service applet-api {
+	// 获取视频列表
+	@handler VideoListHandler
+	get /video-list/:page/:cursor (VideoListRequest) returns (VideoListResponse)
+}
 
+type (
+	VideoListRequest {
+		page      int64 `path:"page"`
+		cursor    int64 `path:"cursor"`
+		feed_type int32 `query:"limit"`
+	}
+	VideoListResponse {
+		VideoList []VideoInfo `json:"video_list"`
+	}
+)
 
+type VideoInfo {
+	VideoId      int64
+	AuthorId     int64
+	AuthorName   string
+	AuthorAvatar string
+	VideoUrl     string
+	Title        string
+	CoverUrl     string
+	Description  string
+	CommentCount int64
+	LikeCount    int64
+}
 

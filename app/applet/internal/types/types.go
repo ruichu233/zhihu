@@ -24,11 +24,27 @@ type EmailRegisterResponse struct {
 	AccessToken string `json:"token"`
 }
 
-type LikeVideoRequest struct {
+type LikeActionRequest struct {
 	ActionType string `json:"action_type"`
 	BizId      string `json:"biz_id"`
-	UserId     int64  `json:"user_id"` // 用户ID
-	ObjId      int64  `path:"obj_id"`  // 对象ID
+	ObjId      int64  `path:"obj_id"` // 对象ID
+}
+
+type LikeActionResponse struct {
+	Status string `json:"status"`
+}
+
+type PublishHandlerRequest struct {
+	AuthorId    int64  `json:"author_id"`
+	VideoId     int64  `json:"video_id"`
+	VideoUrl    string `json:"video_url"`
+	CoverUrl    string `json:"cover_url"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+}
+
+type PublishHandlerResponse struct {
+	VideoId int64 `json:"video_id"`
 }
 
 type UploadUrlResponse struct {
@@ -47,4 +63,27 @@ type VerificationRequest struct {
 }
 
 type VerificationResponse struct {
+}
+
+type VideoInfo struct {
+	VideoId      int64
+	AuthorId     int64
+	AuthorName   string
+	AuthorAvatar string
+	VideoUrl     string
+	Title        string
+	CoverUrl     string
+	Description  string
+	CommentCount int64
+	LikeCount    int64
+}
+
+type VideoListRequest struct {
+	Page      int64 `path:"page"`
+	Cursor    int64 `path:"cursor"`
+	Feed_type int32 `query:"limit"`
+}
+
+type VideoListResponse struct {
+	VideoList []VideoInfo `json:"video_list"`
 }
