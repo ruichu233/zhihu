@@ -23,7 +23,7 @@ func NewLikeActionLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LikeAc
 	}
 }
 
-func (l *LikeActionLogic) LikeAction(req *types.LikeVideoRequest) error {
+func (l *LikeActionLogic) LikeAction(req *types.LikeActionRequest) error {
 	// todo: add your logic here and delete this line
 
 	return nil

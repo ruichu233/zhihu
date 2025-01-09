@@ -7,6 +7,7 @@ import (
 	"github.com/zeromicro/go-zero/zrpc"
 	"zhihu/app/applet/internal/config"
 	"zhihu/app/applet/internal/middleware"
+	"zhihu/app/feed/feedclient"
 	"zhihu/app/like/likeclient"
 	"zhihu/app/user/userclient"
 	"zhihu/app/video/videoclient"
@@ -19,6 +20,7 @@ type ServiceContext struct {
 	Redis               *redis.Client
 	VideoRPC            videoclient.Video
 	LikeRPC             likeclient.Like
+	FeedRPC             feedclient.Feed
 	AuthMiddleware      rest.Middleware
 	MustLoginMiddleware rest.Middleware
 }

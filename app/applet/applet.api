@@ -121,9 +121,9 @@ service applet-api {
 
 type (
 	VideoListRequest {
-		page      int64 `path:"page"`
-		cursor    int64 `path:"cursor"`
-		feed_type int32 `query:"limit"`
+		page     int64 `path:"page"`
+		cursor   int64 `path:"cursor"`
+		feedType int32 `query:"feed_type"`
 	}
 	VideoListResponse {
 		VideoList []VideoInfo `json:"video_list"`

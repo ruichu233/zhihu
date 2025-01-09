@@ -79,9 +79,9 @@ type VideoInfo struct {
 }
 
 type VideoListRequest struct {
-	Page      int64 `path:"page"`
-	Cursor    int64 `path:"cursor"`
-	Feed_type int32 `query:"limit"`
+	Page     int64 `path:"page"`
+	Cursor   int64 `path:"cursor"`
+	FeedType int32 `query:"feed_type"`
 }
 
 type VideoListResponse struct {
