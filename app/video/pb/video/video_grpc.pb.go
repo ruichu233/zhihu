@@ -22,6 +22,7 @@ const (
 	Video_GetUploadURL_FullMethodName = "/video.video/GetUploadURL"
 	Video_Publish_FullMethodName      = "/video.video/Publish"
 	Video_Detail_FullMethodName       = "/video.video/Detail"
+	Video_DetailList_FullMethodName   = "/video.video/DetailList"
 )
 
 // VideoClient is the client API for Video service.
@@ -30,8 +31,12 @@ const (
 type VideoClient interface {
 	// 获取视频上传的预签名 URL
 	GetUploadURL(ctx context.Context, in *GetUploadURLRequest, opts ...grpc.CallOption) (*GetUploadURLResponse, error)
+	// 发布视频
 	Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error)
+	// 根据Id获取视频详情
 	Detail(ctx context.Context, in *DetailRequest, opts ...grpc.CallOption) (*DetailResponse, error)
+	// 根据IdList获取视频详情列表
+	DetailList(ctx context.Context, in *DetailListRequest, opts ...grpc.CallOption) (*DetailListResponse, error)
 }
 
 type videoClient struct {
@@ -72,14 +77,28 @@ func (c *videoClient) Detail(ctx context.Context, in *DetailRequest, opts ...grp
 	return out, nil
 }
 
+func (c *videoClient) DetailList(ctx context.Context, in *DetailListRequest, opts ...grpc.CallOption) (*DetailListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DetailListResponse)
+	err := c.cc.Invoke(ctx, Video_DetailList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VideoServer is the server API for Video service.
 // All implementations must embed UnimplementedVideoServer
 // for forward compatibility.
 type VideoServer interface {
 	// 获取视频上传的预签名 URL
 	GetUploadURL(context.Context, *GetUploadURLRequest) (*GetUploadURLResponse, error)
+	// 发布视频
 	Publish(context.Context, *PublishRequest) (*PublishResponse, error)
+	// 根据Id获取视频详情
 	Detail(context.Context, *DetailRequest) (*DetailResponse, error)
+	// 根据IdList获取视频详情列表
+	DetailList(context.Context, *DetailListRequest) (*DetailListResponse, error)
 	mustEmbedUnimplementedVideoServer()
 }
 
@@ -98,6 +117,9 @@ func (UnimplementedVideoServer) Publish(context.Context, *PublishRequest) (*Publ
 }
 func (UnimplementedVideoServer) Detail(context.Context, *DetailRequest) (*DetailResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Detail not implemented")
+}
+func (UnimplementedVideoServer) DetailList(context.Context, *DetailListRequest) (*DetailListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DetailList not implemented")
 }
 func (UnimplementedVideoServer) mustEmbedUnimplementedVideoServer() {}
 func (UnimplementedVideoServer) testEmbeddedByValue()               {}
@@ -174,6 +196,24 @@ func _Video_Detail_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Video_DetailList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DetailListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VideoServer).DetailList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Video_DetailList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VideoServer).DetailList(ctx, req.(*DetailListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Video_ServiceDesc is the grpc.ServiceDesc for Video service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -192,6 +232,10 @@ var Video_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Detail",
 			Handler:    _Video_Detail_Handler,
+		},
+		{
+			MethodName: "DetailList",
+			Handler:    _Video_DetailList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

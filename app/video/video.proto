@@ -7,8 +7,12 @@ option go_package="./video";
 service video {
   // 获取视频上传的预签名 URL
   rpc GetUploadURL(GetUploadURLRequest) returns (GetUploadURLResponse);
+  // 发布视频
   rpc Publish(PublishRequest) returns(PublishResponse);
+  // 根据Id获取视频详情
   rpc Detail(DetailRequest) returns(DetailResponse);
+  // 根据IdList获取视频详情列表
+  rpc DetailList(DetailListRequest) returns(DetailListResponse);
 }
 message GetUploadURLRequest {
   string filename = 1; // 客户端希望上传的文件名
@@ -37,22 +41,38 @@ message DetailRequest {
 }
 
 message DetailResponse {
-  int64 author_id = 1;
-  string video_url = 2;
-  string title = 3;
-  string cover_url = 4;
-  string description = 5;
-  repeated int64 tag_ids = 6;
-  int64 comment_count = 7;
-  int64 like_count = 8;
+  int64 video_id = 1;
+  int64 author_id = 2;
+  string video_url = 3;
+  string title = 4;
+  string cover_url = 5;
+  string description = 6;
+  repeated int64 tag_ids = 7;
+  int64 comment_count = 8;
+  int64 like_count = 9;
 }
 
 
 message VideoFeed {
-  string video_id = 1;
+  int64 video_id = 1;
   string title = 2;
   string video_url = 3;
   string cover_url = 4;
   int64 create_time = 5;
   int64 author_id = 6;
+}
+
+message DetailListRequest{
+  repeated int64 video_ids = 1;
+  VideoFeedType feed_type = 2;
+}
+
+enum VideoFeedType {
+  VideoFeedType_UNKNOWN = 0;
+  VideoFeedType_Follow = 1; // 关注
+  VideoFeedType_RECOMMEND = 2; // 推荐
+}
+
+message DetailListResponse{
+  repeated VideoFeed video_feeds = 1;
 }

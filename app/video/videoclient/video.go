@@ -13,6 +13,8 @@ import (
 )
 
 type (
+	DetailListRequest    = video.DetailListRequest
+	DetailListResponse   = video.DetailListResponse
 	DetailRequest        = video.DetailRequest
 	DetailResponse       = video.DetailResponse
 	GetUploadURLRequest  = video.GetUploadURLRequest
@@ -24,8 +26,12 @@ type (
 	Video interface {
 		// 获取视频上传的预签名 URL
 		GetUploadURL(ctx context.Context, in *GetUploadURLRequest, opts ...grpc.CallOption) (*GetUploadURLResponse, error)
+		// 发布视频
 		Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error)
+		// 根据Id获取视频详情
 		Detail(ctx context.Context, in *DetailRequest, opts ...grpc.CallOption) (*DetailResponse, error)
+		// 根据IdList获取视频详情列表
+		DetailList(ctx context.Context, in *DetailListRequest, opts ...grpc.CallOption) (*DetailListResponse, error)
 	}
 
 	defaultVideo struct {
@@ -45,12 +51,20 @@ func (m *defaultVideo) GetUploadURL(ctx context.Context, in *GetUploadURLRequest
 	return client.GetUploadURL(ctx, in, opts...)
 }
 
+// 发布视频
 func (m *defaultVideo) Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error) {
 	client := video.NewVideoClient(m.cli.Conn())
 	return client.Publish(ctx, in, opts...)
 }
 
+// 根据Id获取视频详情
 func (m *defaultVideo) Detail(ctx context.Context, in *DetailRequest, opts ...grpc.CallOption) (*DetailResponse, error) {
 	client := video.NewVideoClient(m.cli.Conn())
 	return client.Detail(ctx, in, opts...)
+}
+
+// 根据IdList获取视频详情列表
+func (m *defaultVideo) DetailList(ctx context.Context, in *DetailListRequest, opts ...grpc.CallOption) (*DetailListResponse, error) {
+	client := video.NewVideoClient(m.cli.Conn())
+	return client.DetailList(ctx, in, opts...)
 }

@@ -28,12 +28,20 @@ func (s *VideoServer) GetUploadURL(ctx context.Context, in *video.GetUploadURLRe
 	return l.GetUploadURL(in)
 }
 
+// 发布视频
 func (s *VideoServer) Publish(ctx context.Context, in *video.PublishRequest) (*video.PublishResponse, error) {
 	l := logic.NewPublishLogic(ctx, s.svcCtx)
 	return l.Publish(in)
 }
 
+// 根据Id获取视频详情
 func (s *VideoServer) Detail(ctx context.Context, in *video.DetailRequest) (*video.DetailResponse, error) {
 	l := logic.NewDetailLogic(ctx, s.svcCtx)
 	return l.Detail(in)
+}
+
+// 根据IdList获取视频详情列表
+func (s *VideoServer) DetailList(ctx context.Context, in *video.DetailListRequest) (*video.DetailListResponse, error) {
+	l := logic.NewDetailListLogic(ctx, s.svcCtx)
+	return l.DetailList(in)
 }
