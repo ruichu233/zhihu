@@ -25,7 +25,8 @@ func NewPublishLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PublishLo
 }
 
 func (l *PublishLogic) Publish(req *types.PublishHandlerRequest, userId int64) (resp *types.PublishHandlerResponse, err error) {
-	publishResponse, err := l.svcCtx.VideoRPC.Publish(l.ctx, &videoclient.PublishRequest{
+	resp = &types.PublishHandlerResponse{}
+	publishResponse, err := l.svcCtx.VideoRPC.PublishVideo(l.ctx, &videoclient.PublishRequest{
 		AuthorId:    userId,
 		CoverUrl:    req.CoverUrl,
 		Description: req.Description,
@@ -36,5 +37,5 @@ func (l *PublishLogic) Publish(req *types.PublishHandlerRequest, userId int64) (
 		return nil, err
 	}
 	resp.VideoId = publishResponse.VideoId
-	return
+	return resp, nil
 }

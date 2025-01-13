@@ -21,6 +21,7 @@ func PublishHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		userId, err := strconv.ParseInt(userIdStr, 10, 64)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
+			return
 		}
 		l := logic.NewPublishLogic(r.Context(), svcCtx)
 		resp, err := l.Publish(&req, userId)

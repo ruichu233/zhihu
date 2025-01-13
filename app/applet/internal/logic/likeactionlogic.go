@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"zhihu/app/like/pb/like"
 
 	"zhihu/app/applet/internal/svc"
 	"zhihu/app/applet/internal/types"
@@ -24,7 +25,13 @@ func NewLikeActionLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LikeAc
 }
 
 func (l *LikeActionLogic) LikeAction(req *types.LikeActionRequest) error {
-	// todo: add your logic here and delete this line
-
+	_, err := l.svcCtx.LikeRPC.LikeAction(l.ctx, &like.LikeActionRequest{
+		ActionType: like.LikeActionRequest_ActionType(req.ActionType),
+		BizId:      req.BizId,
+		ObjId:      req.ObjId,
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }

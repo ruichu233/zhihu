@@ -28,32 +28,28 @@ func NewPublishContentLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Pu
 
 // 当创作者发布新内容时，推送内容发布事件
 func (l *PublishContentLogic) PublishContent(in *feed.PublishContentRequest) (*feed.PublishContentResponse, error) {
-	rdb := l.svcCtx.RDB
-
-	rdb.ZAdd(l.ctx, GetCacheKey(in.UserId), redis.Z{
-		Score:  float64(in.VideoCreatorTimestamp),
-		Member: in.VideoId,
-	})
 	// 遍历关注列表，给每个粉丝推送新内容事件
 	// 1、获取粉丝列表
 	followerList, err := l.svcCtx.FollowRPC.ListFollowers(l.ctx, &follow.GetFollowerListRequest{
-		UserId: in.UserId,
+		UserId:   in.UserId,
+		Cursor:   0,
+		PageSize: 0,
+		Id:       0,
 	})
 	if err != nil {
 		return nil, err
 	}
 	// 2、推送新内容事件
-	for _, followerId := range followerList.FollowerIds {
+	for _, item := range followerList.Items {
 		// 3、将新内容事件推送到粉丝的缓存列表中
-		intCmd := l.svcCtx.RDB.ZAdd(l.ctx, GetCacheKey(followerId), redis.Z{
+		intCmd := l.svcCtx.RDB.ZAdd(l.ctx, GetCacheKey(item.Id), redis.Z{
 			Score:  float64(in.VideoCreatorTimestamp),
 			Member: in.VideoId,
 		})
 		if intCmd.Val() <= 0 {
-			logx.Errorf("用户 %d 推送新内容失败", followerId)
+			logx.Errorf("用户 %d 推送新内容失败", item.Id)
 		}
 	}
-
 	return &feed.PublishContentResponse{
 		Success: true,
 	}, nil

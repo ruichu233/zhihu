@@ -84,8 +84,8 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Middleware{serverCtx.AuthMiddleware},
 			[]rest.Route{
 				{
-					Method:  http.MethodGet,
-					Path:    "/video-list/:page/:cursor",
+					Method:  http.MethodPost,
+					Path:    "/video-list",
 					Handler: VideoListHandler(serverCtx),
 				},
 			}...,

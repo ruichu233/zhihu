@@ -22,6 +22,11 @@ func NewVideoServer(svcCtx *svc.ServiceContext) *VideoServer {
 	}
 }
 
+func (s *VideoServer) Ping(ctx context.Context, in *video.Request) (*video.Response, error) {
+	l := logic.NewPingLogic(ctx, s.svcCtx)
+	return l.Ping(in)
+}
+
 // 获取视频上传的预签名 URL
 func (s *VideoServer) GetUploadURL(ctx context.Context, in *video.GetUploadURLRequest) (*video.GetUploadURLResponse, error) {
 	l := logic.NewGetUploadURLLogic(ctx, s.svcCtx)
@@ -29,19 +34,31 @@ func (s *VideoServer) GetUploadURL(ctx context.Context, in *video.GetUploadURLRe
 }
 
 // 发布视频
-func (s *VideoServer) Publish(ctx context.Context, in *video.PublishRequest) (*video.PublishResponse, error) {
-	l := logic.NewPublishLogic(ctx, s.svcCtx)
-	return l.Publish(in)
+func (s *VideoServer) PublishVideo(ctx context.Context, in *video.PublishRequest) (*video.PublishResponse, error) {
+	l := logic.NewPublishVideoLogic(ctx, s.svcCtx)
+	return l.PublishVideo(in)
 }
 
 // 根据Id获取视频详情
-func (s *VideoServer) Detail(ctx context.Context, in *video.DetailRequest) (*video.DetailResponse, error) {
-	l := logic.NewDetailLogic(ctx, s.svcCtx)
-	return l.Detail(in)
+func (s *VideoServer) DetailVideo(ctx context.Context, in *video.DetailRequest) (*video.DetailResponse, error) {
+	l := logic.NewDetailVideoLogic(ctx, s.svcCtx)
+	return l.DetailVideo(in)
 }
 
 // 根据IdList获取视频详情列表
 func (s *VideoServer) DetailList(ctx context.Context, in *video.DetailListRequest) (*video.DetailListResponse, error) {
 	l := logic.NewDetailListLogic(ctx, s.svcCtx)
 	return l.DetailList(in)
+}
+
+// 根据userId获取作品列表
+func (s *VideoServer) WorkList(ctx context.Context, in *video.WorkListRequest) (*video.WorkListResponse, error) {
+	l := logic.NewWorkListLogic(ctx, s.svcCtx)
+	return l.WorkList(in)
+}
+
+// 根据userId获取喜欢列表
+func (s *VideoServer) LikeList(ctx context.Context, in *video.LikeListRequest) (*video.LikeListResponse, error) {
+	l := logic.NewLikeListLogic(ctx, s.svcCtx)
+	return l.LikeList(in)
 }

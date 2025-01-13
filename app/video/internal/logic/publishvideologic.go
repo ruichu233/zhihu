@@ -4,29 +4,31 @@ import (
 	"context"
 	"github.com/yitter/idgenerator-go/idgen"
 	"gorm.io/gorm"
-	"zhihu/app/feed/pb/feed"
 	"zhihu/app/video/internal/model"
+
 	"zhihu/app/video/internal/svc"
 	"zhihu/app/video/pb/video"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type PublishLogic struct {
+type PublishVideoLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewPublishLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PublishLogic {
-	return &PublishLogic{
+func NewPublishVideoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PublishVideoLogic {
+	return &PublishVideoLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *PublishLogic) Publish(in *video.PublishRequest) (*video.PublishResponse, error) {
+// 发布视频
+func (l *PublishVideoLogic) PublishVideo(in *video.PublishRequest) (*video.PublishResponse, error) {
+	resp := &video.PublishResponse{}
 	videoId := idgen.NextId()
 	videos := model.Video{
 		BaseModel: model.BaseModel{
@@ -39,25 +41,25 @@ func (l *PublishLogic) Publish(in *video.PublishRequest) (*video.PublishResponse
 		AuthorId:    in.AuthorId,
 		CommentNum:  0,
 		LikeNum:     0,
-		TagIds:      in.TagIds,
 	}
 	if err := l.svcCtx.DB.Session(&gorm.Session{}).Transaction(func(tx *gorm.DB) error {
 		// 保存视频信息
 		if err := tx.Model(&model.Video{}).Create(&videos).Error; err != nil {
 			return err
 		}
-		// 向 feed 服务发送消息
-		_, err := l.svcCtx.FeedRPC.PublishContent(l.ctx, &feed.PublishContentRequest{
-			UserId:                in.AuthorId,
-			VideoId:               videoId,
-			VideoCreatorTimestamp: videos.CreatedAt.Unix(),
-		})
-		if err != nil {
-			return err
-		}
+		//// 向 feed 服务发送消息
+		//_, err := l.svcCtx.FeedRPC.PublishContent(l.ctx, &feed.PublishContentRequest{
+		//	UserId:                in.AuthorId,
+		//	VideoId:               videoId,
+		//	VideoCreatorTimestamp: videos.CreatedAt.Unix(),
+		//})
+		//if err != nil {
+		//	return err
+		//}
 		return nil
 	}); err != nil {
 		return nil, err
 	}
-	return &video.PublishResponse{VideoId: videoId}, nil
+	resp.VideoId = videoId
+	return resp, nil
 }

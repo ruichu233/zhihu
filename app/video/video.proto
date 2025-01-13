@@ -3,16 +3,28 @@ syntax = "proto3";
 package video;
 option go_package="./video";
 
+message Request {
+  string ping = 1;
+}
 
+message Response {
+  string pong = 1;
+}
 service video {
+  rpc Ping(Request) returns(Response);
   // 获取视频上传的预签名 URL
   rpc GetUploadURL(GetUploadURLRequest) returns (GetUploadURLResponse);
   // 发布视频
-  rpc Publish(PublishRequest) returns(PublishResponse);
+  rpc PublishVideo(PublishRequest) returns(PublishResponse);
   // 根据Id获取视频详情
-  rpc Detail(DetailRequest) returns(DetailResponse);
+  rpc DetailVideo(DetailRequest) returns(DetailResponse);
   // 根据IdList获取视频详情列表
   rpc DetailList(DetailListRequest) returns(DetailListResponse);
+  // 根据userId获取作品列表
+  rpc WorkList(WorkListRequest) returns(WorkListResponse);
+  // 根据userId获取喜欢列表
+  rpc LikeList(LikeListRequest) returns(LikeListResponse);
+
 }
 message GetUploadURLRequest {
   string filename = 1; // 客户端希望上传的文件名
@@ -29,7 +41,6 @@ message PublishRequest {
   string title = 3;
   string cover_url = 4;
   string description = 5;
-  repeated int64 tag_ids = 6;
 }
 
 message PublishResponse {
@@ -60,11 +71,15 @@ message VideoFeed {
   string cover_url = 4;
   int64 create_time = 5;
   int64 author_id = 6;
+  string description = 7;
+  int64 comment_count = 8;
+  int64 like_count = 9;
 }
 
 message DetailListRequest{
   repeated int64 video_ids = 1;
   VideoFeedType feed_type = 2;
+
 }
 
 enum VideoFeedType {
@@ -74,5 +89,19 @@ enum VideoFeedType {
 }
 
 message DetailListResponse{
+  repeated VideoFeed video_feeds = 1;
+}
+
+message WorkListRequest{
+  int64 user_id = 1;
+}
+
+message WorkListResponse{
+  repeated VideoFeed video_feeds = 1;
+}
+message LikeListRequest{
+  int64 user_id = 1;
+}
+message LikeListResponse{
   repeated VideoFeed video_feeds = 1;
 }

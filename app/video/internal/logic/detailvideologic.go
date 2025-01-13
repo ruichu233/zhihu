@@ -7,28 +7,29 @@ import (
 	"strings"
 	"time"
 	"zhihu/app/video/internal/model"
-	"zhihu/app/video/pb/video"
 
 	"zhihu/app/video/internal/svc"
+	"zhihu/app/video/pb/video"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type DetailLogic struct {
+type DetailVideoLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DetailLogic {
-	return &DetailLogic{
+func NewDetailVideoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DetailVideoLogic {
+	return &DetailVideoLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *DetailLogic) Detail(in *video.DetailRequest) (*video.DetailResponse, error) {
+// 根据Id获取视频详情
+func (l *DetailVideoLogic) DetailVideo(in *video.DetailRequest) (*video.DetailResponse, error) {
 	// 1、查缓存
 	cacheKey := GetVideoKey(in.VideoId)
 	result, err := l.svcCtx.RDB.HGetAll(l.ctx, cacheKey).Result()
@@ -76,14 +77,14 @@ func (l *DetailLogic) Detail(in *video.DetailRequest) (*video.DetailResponse, er
 	// 更新缓存
 	go func() {
 		mp := make(map[string]interface{})
-		tagIdStrs := make([]string, 0, len(videoModel.TagIds))
-		for _, v := range videoModel.TagIds {
-			tagIdStrs = append(tagIdStrs, strconv.FormatInt(v, 10))
-		}
+		//tagIdStrs := make([]string, 0, len(videoModel.TagIds))
+		//for _, v := range videoModel.TagIds {
+		//	tagIdStrs = append(tagIdStrs, strconv.FormatInt(v, 10))
+		//}
 		mp["author_id"] = videoModel.AuthorId
 		mp["comment_count"] = videoModel.CommentNum
 		mp["like_count"] = videoModel.LikeNum
-		mp["tag_ids"] = strings.Join(tagIdStrs, "|")
+		//mp["tag_ids"] = strings.Join(tagIdStrs, "|")
 		mp["cover_url"] = videoModel.CoverUrl
 		mp["description"] = videoModel.Description
 		mp["title"] = videoModel.Title
@@ -98,9 +99,9 @@ func (l *DetailLogic) Detail(in *video.DetailRequest) (*video.DetailResponse, er
 		CoverUrl:     videoModel.CoverUrl,
 		Description:  videoModel.Description,
 		LikeCount:    videoModel.LikeNum,
-		TagIds:       videoModel.TagIds,
-		Title:        videoModel.Title,
-		VideoUrl:     videoModel.VideoUrl,
+		//TagIds:       videoModel.TagIds,
+		Title:    videoModel.Title,
+		VideoUrl: videoModel.VideoUrl,
 	}
 	return data, nil
 }

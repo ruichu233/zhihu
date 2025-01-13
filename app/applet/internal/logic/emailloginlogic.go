@@ -25,7 +25,7 @@ func NewEmailLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *EmailL
 }
 
 func (l *EmailLoginLogic) EmailLogin(req *types.EmailLoginRequest) (resp *types.EmailLoginResponse, err error) {
-	resp = new(types.EmailLoginResponse)
+	resp = &types.EmailLoginResponse{}
 	if req.Email = strings.TrimSpace(req.Email); len(req.Email) == 0 {
 		return nil, fmt.Errorf("邮箱不能为空")
 	}
@@ -39,8 +39,7 @@ func (l *EmailLoginLogic) EmailLogin(req *types.EmailLoginRequest) (resp *types.
 	if err != nil {
 		return nil, err
 	}
-	return &types.EmailLoginResponse{
-		UserId:      loginResp.UserId,
-		AccessToken: loginResp.AccessToken,
-	}, nil
+	resp.AccessToken = loginResp.AccessToken
+	resp.UserId = loginResp.UserId
+	return resp, nil
 }

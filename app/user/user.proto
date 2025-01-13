@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package user;
-option go_package="./user";
+option go_package = "./user";
 
 
 service User {
@@ -52,8 +52,9 @@ message UserInfoResponse {
   int64 id = 1;
   string username = 2;
   string email = 3;
-  int64 follower_count = 4;
-  int64 followed_count = 5;
+  string avatar = 4;
+  int64 follower_count = 5;
+  int64 followed_count = 6;
 }
 
 message FollowerListRequest {

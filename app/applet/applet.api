@@ -68,7 +68,7 @@ service applet-api {
 }
 
 type LikeActionRequest {
-	actionType string `json:"action_type"`
+	actionType int32  `json:"action_type"`
 	bizId      string `json:"biz_id"`
 	objId      int64  `path:"obj_id"` // 对象ID
 }
@@ -97,8 +97,6 @@ type (
 		CoverUrl string `json:"cover_url"`
 	}
 	PublishHandlerRequest {
-		AuthorId    int64  `json:"author_id"`
-		VideoId     int64  `json:"video_id"`
 		VideoUrl    string `json:"video_url"`
 		CoverUrl    string `json:"cover_url"`
 		Title       string `json:"title"`
@@ -116,7 +114,7 @@ type (
 service applet-api {
 	// 获取视频列表
 	@handler VideoListHandler
-	get /video-list/:page/:cursor (VideoListRequest) returns (VideoListResponse)
+	post /video-list (VideoListRequest) returns (VideoListResponse)
 }
 
 type (
@@ -131,15 +129,15 @@ type (
 )
 
 type VideoInfo {
-	VideoId      int64
-	AuthorId     int64
-	AuthorName   string
-	AuthorAvatar string
-	VideoUrl     string
-	Title        string
-	CoverUrl     string
-	Description  string
-	CommentCount int64
-	LikeCount    int64
+	VideoId      int64  `json:"video_id"`
+	AuthorId     int64  `json:"author_id"`
+	AuthorName   string `json:"author_name"`
+	AuthorAvatar string `json:"author_avatar"`
+	VideoUrl     string `json:"video_url`
+	Title        string `json:"title"`
+	CoverUrl     string `json:"cover_url"`
+	Description  string `json:"description"`
+	CommentCount int64  `json:"comment_count"`
+	LikeCount    int64  `json:"like_count"`
 }
 

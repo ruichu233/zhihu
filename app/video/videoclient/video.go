@@ -19,19 +19,30 @@ type (
 	DetailResponse       = video.DetailResponse
 	GetUploadURLRequest  = video.GetUploadURLRequest
 	GetUploadURLResponse = video.GetUploadURLResponse
+	LikeListRequest      = video.LikeListRequest
+	LikeListResponse     = video.LikeListResponse
 	PublishRequest       = video.PublishRequest
 	PublishResponse      = video.PublishResponse
+	Request              = video.Request
+	Response             = video.Response
 	VideoFeed            = video.VideoFeed
+	WorkListRequest      = video.WorkListRequest
+	WorkListResponse     = video.WorkListResponse
 
 	Video interface {
+		Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 		// 获取视频上传的预签名 URL
 		GetUploadURL(ctx context.Context, in *GetUploadURLRequest, opts ...grpc.CallOption) (*GetUploadURLResponse, error)
 		// 发布视频
-		Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error)
+		PublishVideo(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error)
 		// 根据Id获取视频详情
-		Detail(ctx context.Context, in *DetailRequest, opts ...grpc.CallOption) (*DetailResponse, error)
+		DetailVideo(ctx context.Context, in *DetailRequest, opts ...grpc.CallOption) (*DetailResponse, error)
 		// 根据IdList获取视频详情列表
 		DetailList(ctx context.Context, in *DetailListRequest, opts ...grpc.CallOption) (*DetailListResponse, error)
+		// 根据userId获取作品列表
+		WorkList(ctx context.Context, in *WorkListRequest, opts ...grpc.CallOption) (*WorkListResponse, error)
+		// 根据userId获取喜欢列表
+		LikeList(ctx context.Context, in *LikeListRequest, opts ...grpc.CallOption) (*LikeListResponse, error)
 	}
 
 	defaultVideo struct {
@@ -45,6 +56,11 @@ func NewVideo(cli zrpc.Client) Video {
 	}
 }
 
+func (m *defaultVideo) Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+	client := video.NewVideoClient(m.cli.Conn())
+	return client.Ping(ctx, in, opts...)
+}
+
 // 获取视频上传的预签名 URL
 func (m *defaultVideo) GetUploadURL(ctx context.Context, in *GetUploadURLRequest, opts ...grpc.CallOption) (*GetUploadURLResponse, error) {
 	client := video.NewVideoClient(m.cli.Conn())
@@ -52,19 +68,31 @@ func (m *defaultVideo) GetUploadURL(ctx context.Context, in *GetUploadURLRequest
 }
 
 // 发布视频
-func (m *defaultVideo) Publish(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error) {
+func (m *defaultVideo) PublishVideo(ctx context.Context, in *PublishRequest, opts ...grpc.CallOption) (*PublishResponse, error) {
 	client := video.NewVideoClient(m.cli.Conn())
-	return client.Publish(ctx, in, opts...)
+	return client.PublishVideo(ctx, in, opts...)
 }
 
 // 根据Id获取视频详情
-func (m *defaultVideo) Detail(ctx context.Context, in *DetailRequest, opts ...grpc.CallOption) (*DetailResponse, error) {
+func (m *defaultVideo) DetailVideo(ctx context.Context, in *DetailRequest, opts ...grpc.CallOption) (*DetailResponse, error) {
 	client := video.NewVideoClient(m.cli.Conn())
-	return client.Detail(ctx, in, opts...)
+	return client.DetailVideo(ctx, in, opts...)
 }
 
 // 根据IdList获取视频详情列表
 func (m *defaultVideo) DetailList(ctx context.Context, in *DetailListRequest, opts ...grpc.CallOption) (*DetailListResponse, error) {
 	client := video.NewVideoClient(m.cli.Conn())
 	return client.DetailList(ctx, in, opts...)
+}
+
+// 根据userId获取作品列表
+func (m *defaultVideo) WorkList(ctx context.Context, in *WorkListRequest, opts ...grpc.CallOption) (*WorkListResponse, error) {
+	client := video.NewVideoClient(m.cli.Conn())
+	return client.WorkList(ctx, in, opts...)
+}
+
+// 根据userId获取喜欢列表
+func (m *defaultVideo) LikeList(ctx context.Context, in *LikeListRequest, opts ...grpc.CallOption) (*LikeListResponse, error) {
+	client := video.NewVideoClient(m.cli.Conn())
+	return client.LikeList(ctx, in, opts...)
 }
