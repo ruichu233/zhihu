@@ -30,7 +30,7 @@ func NewFollowActionLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Foll
 }
 func (l *FollowActionLogic) FollowAction(in *follow.FollowActionRequest) (*follow.FollowActionResponse, error) {
 	// 构建缓存键
-	followKey := GetFollowKey(in.FollowerId)
+	followKey := GetFollowingKey(in.FollowerId)
 
 	// 查询数据库中的关注状态
 	isFollowing, err := l.checkDBFollowStatus(in.FollowerId, in.FolloweeId)
@@ -140,9 +140,12 @@ func (l *FollowActionLogic) unfollowUser(followerId, followeeId int64, followKey
 	})
 }
 
-func GetFollowKey(followerId int64) string {
-	return fmt.Sprintf("following_%d", followerId)
+// 获取关注列表的缓存键
+func GetFollowingKey(userId int64) string {
+	return fmt.Sprintf("following_%d", userId)
 }
-func GetFollowerKey(followeeId int64) string {
-	return fmt.Sprintf("follower_%d", followeeId)
+
+// 获取粉丝列表的缓存键
+func GetFollowerKey(userId int64) string {
+	return fmt.Sprintf("follower_%d", userId)
 }

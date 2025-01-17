@@ -2,7 +2,7 @@ package logic
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
 	"fmt"
 	"github.com/redis/go-redis/v9"
 	"strconv"
@@ -28,36 +28,40 @@ func NewListFollowingLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Lis
 	}
 }
 
+// ListFollowing 获取关注列表
 func (l *ListFollowingLogic) ListFollowing(in *follow.GetFollowListRequest) (*follow.GetFollowListResponse, error) {
-	if in.PageSize < 0 {
+	if in.PageSize == 0 {
 		in.PageSize = 10
 	}
-	if in.Cursor < 0 {
-		in.Cursor = 0
+	if in.Cursor == 0 {
+		in.Cursor = time.Now().Unix()
 	}
 	var (
 		isCache, isEnd bool
 		cursor, lastId int64
+		followIdList   []int64
 		follows        []*model.Follow
 		curPage        []*follow.FollowItem
 	)
 
-	// 构建缓存键
-	followKey := GetFollowKey(in.UserId)
-	ids, _ := l.cacheFollowing(followKey, in.Cursor, in.PageSize)
-	if len(ids) > 0 {
+	// 1、构建获取关注id列表缓存键
+	followKey := GetFollowingKey(in.UserId)
+	// 2、从缓存中获取关注id列表
+	followIdList, _ = l.cacheFollowing(followKey, in.Cursor, in.PageSize)
+	if len(followIdList) > 0 {
 		isCache = true
-		if ids[len(ids)-1] == -1 {
-			ids = ids[:len(ids)-1]
+		if followIdList[len(followIdList)-1] == -1 {
+			followIdList = followIdList[:len(followIdList)-1]
 			isEnd = true
 		}
-		if len(ids) == 0 {
+		if len(followIdList) == 0 {
 			return &follow.GetFollowListResponse{}, nil
 		}
-		var follows []*model.Follow
-		if err := l.svcCtx.DB.Model(&model.Follow{}).Where("follower_id = ?").Where("followee_id IN ?", ids).Find(&follows).Error; err != nil {
+		_follows, err := l.getFollowingsListByIds(in.UserId, followIdList)
+		if err != nil {
 			return nil, err
 		}
+		follows = _follows
 		for _, v := range follows {
 			curPage = append(curPage, &follow.FollowItem{
 				Id:         v.Id,
@@ -66,11 +70,10 @@ func (l *ListFollowingLogic) ListFollowing(in *follow.GetFollowListRequest) (*fo
 			})
 		}
 	} else {
-		var follows []*model.Follow
-		cursorToTime := time.Unix(in.Cursor, 0)
+		defaultCache := 10 * in.PageSize
 		if err := l.svcCtx.DB.Model(&model.Follow{}).
-			Where("follower_id = ? AND updated_at <?", in.UserId, cursorToTime).
-			Limit(1000).
+			Where("follower_id = ? AND updated_at <?", in.UserId, cursor).
+			Limit(int(defaultCache)).
 			Find(&follows).Error; err != nil {
 			return nil, err
 		}
@@ -85,6 +88,7 @@ func (l *ListFollowingLogic) ListFollowing(in *follow.GetFollowListRequest) (*fo
 			isEnd = true
 		}
 		for _, f := range firstPageFollows {
+			followIdList = append(followIdList, f.FolloweeID)
 			curPage = append(curPage, &follow.FollowItem{
 				Id:         f.Id,
 				FolloweeId: f.FolloweeID,
@@ -96,6 +100,7 @@ func (l *ListFollowingLogic) ListFollowing(in *follow.GetFollowListRequest) (*fo
 	if len(curPage) > 0 {
 		pageLast := curPage[len(curPage)-1]
 		lastId = pageLast.Id
+		cursor = pageLast.CreateTime
 		for k, v := range curPage {
 			if in.Cursor == v.CreateTime && v.Id == in.Id {
 				curPage = curPage[k:]
@@ -106,26 +111,17 @@ func (l *ListFollowingLogic) ListFollowing(in *follow.GetFollowListRequest) (*fo
 	// 构建缓存
 	if !isCache {
 		go func() {
-			if len(follows) < 1000 && len(follows) > 0 {
+			if len(follows) < int(10*in.PageSize) && len(follows) > 0 {
 				follows = append(follows, &model.Follow{
-					BaseModel: model.BaseModel{
-						Id: -1,
-					},
+					FolloweeID: -1,
 				})
 				for _, v := range follows {
-					var score int64
-					if v.Id == -1 {
-						score = 0
-					} else {
-						score = v.UpdatedAt.Unix()
-					}
 					l.svcCtx.RDB.ZAdd(l.ctx, followKey, redis.Z{
-						Score:  float64(score),
+						Score:  float64(v.UpdatedAt.Unix()),
 						Member: v.FolloweeID,
 					})
 				}
 			}
-
 		}()
 	}
 
@@ -138,21 +134,13 @@ func (l *ListFollowingLogic) ListFollowing(in *follow.GetFollowListRequest) (*fo
 }
 
 func (l *ListFollowingLogic) cacheFollowing(key string, cursor, ps int64) ([]int64, error) {
-	res, err := l.svcCtx.RDB.Exists(l.ctx, key).Result()
-	if err != nil {
-		if errors.Is(err, redis.Nil) {
-			return []int64{}, nil
-		}
-		return nil, err
-	}
-	if res > 0 {
-		if err := l.svcCtx.RDB.Expire(l.ctx, key, time.Hour*24).Err(); err != nil {
-			return nil, err
-		}
+	maxScore := "inf"
+	if cursor > 0 {
+		maxScore = fmt.Sprintf("%d", cursor)
 	}
 	result, err := l.svcCtx.RDB.ZRevRangeByScore(l.ctx, key, &redis.ZRangeBy{
-		Min:    "0",
-		Max:    fmt.Sprintf("%d", cursor),
+		Min:    "-inf",
+		Max:    maxScore,
 		Count:  ps,
 		Offset: 0,
 	}).Result()
@@ -168,4 +156,59 @@ func (l *ListFollowingLogic) cacheFollowing(key string, cursor, ps int64) ([]int
 		ids = append(ids, id)
 	}
 	return ids, nil
+}
+
+// 根据id批量查询关注信息
+func (l *ListFollowingLogic) getFollowingsListByIds(userId int64, followingIds []int64) ([]*model.Follow, error) {
+	key := fmt.Sprintf("following:%d", userId)
+	mkeys := make([]string, 0, len(followingIds))
+	for _, v := range followingIds {
+		mkeys = append(mkeys, fmt.Sprintf("%d", v))
+	}
+	result, _ := l.svcCtx.RDB.HMGet(l.ctx, key, mkeys...).Result()
+	followSet := make(map[int64]*model.Follow)
+	for _, v := range result {
+		if v == "" {
+			continue
+		}
+		_follow := &model.Follow{}
+		err := json.Unmarshal([]byte(v.(string)), _follow)
+		if err != nil {
+			return nil, err
+		}
+		followSet[_follow.FolloweeID] = _follow
+	}
+	noHit := make([]int64, 0)
+	for _, v := range followingIds {
+		if _, ok := followSet[v]; !ok {
+			noHit = append(noHit, v)
+		}
+	}
+	// 如果缓存中的获取的数据不够
+	if len(noHit) > 0 {
+		var list []*model.Follow
+		// 在数据库中查询缓存没有的数据，并且存入缓存
+		err := l.svcCtx.DB.Model(&model.Follow{}).
+			Where("followee_id = ? and follower_id in ?", userId, noHit).
+			Find(&list).Error
+		if err != nil {
+			return nil, err
+		}
+		for _, v := range list {
+			followSet[v.FolloweeID] = v
+			var b []byte
+			if b, err = json.Marshal(v); err != nil {
+				return nil, err
+			}
+			_ = l.svcCtx.RDB.HSet(l.ctx, key, fmt.Sprintf("%d", v.FolloweeID), string(b)).Err()
+		}
+	}
+	// 最后组装
+	var resultList []*model.Follow
+	for _, v := range followingIds {
+		if _follow, ok := followSet[v]; ok {
+			resultList = append(resultList, _follow)
+		}
+	}
+	return resultList, nil
 }

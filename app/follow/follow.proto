@@ -74,6 +74,6 @@ message FollowItem{
 
 message FollowerItem{
   int64 id = 1;
-  int64 followee_id = 2;//关注者id
+  int64 follower_id = 2;//关注者id
   int64 create_time = 3;// 关注时间
 }
