@@ -22,6 +22,10 @@ type LikeCount struct {
 	LikeNum int64  `gorm:"column:like_num;type:bigint(20);not null" json:"like_num"`
 }
 
+func (l *LikeCount) TableName() string {
+	return "like_counts"
+}
+
 func GetLikeRecordKey(bizId string, userId int64) string {
 	return fmt.Sprintf("user:likes:patten:%d:%s", userId, bizId)
 }

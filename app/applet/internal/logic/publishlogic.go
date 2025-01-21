@@ -36,6 +36,16 @@ func (l *PublishLogic) Publish(req *types.PublishHandlerRequest, userId int64) (
 	if err != nil {
 		return nil, err
 	}
+	//// 2、向 feed 服务发送消息
+	//_, err = l.svcCtx.FeedRPC.PublishContent(l.ctx, &feed.PublishContentRequest{
+	//	UserId:                userId,
+	//	VideoId:               publishResponse.VideoId,
+	//	VideoCreatorTimestamp: now.Unix(),
+	//	VideoDescription:      req.Description,
+	//})
+	//if err != nil {
+	//	return err
+	//}
 	resp.VideoId = publishResponse.VideoId
 	return resp, nil
 }

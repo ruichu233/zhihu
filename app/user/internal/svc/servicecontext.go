@@ -2,8 +2,6 @@ package svc
 
 import (
 	"github.com/redis/go-redis/v9"
-	"github.com/zeromicro/go-zero/core/discov"
-	"github.com/zeromicro/go-zero/zrpc"
 	"gorm.io/gorm"
 	"zhihu/app/user/internal/config"
 	"zhihu/app/user/model"
@@ -27,17 +25,17 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	if err != nil {
 		panic(err)
 	}
-	videoConn := zrpc.MustNewClient(zrpc.RpcClientConf{
-		Etcd: discov.EtcdConf{ // 通过 etcd 服务发现时，只需要给 Etcd 配置即可
-			Hosts: []string{"127.0.0.1:2379"},
-			Key:   "video.rpc",
-		},
-	})
+	//videoConn := zrpc.MustNewClient(zrpc.RpcClientConf{
+	//	Etcd: discov.EtcdConf{ // 通过 etcd 服务发现时，只需要给 Etcd 配置即可
+	//		Hosts: []string{"127.0.0.1:2379"},
+	//		Key:   "video.rpc",
+	//	},
+	//})
 
 	return &ServiceContext{
-		Config:   c,
-		DB:       db.InitMysql(&c.DBConf),
-		RDB:      rdb.InitRedis(&c.RDBConf),
-		VideoRPC: videoclient.NewVideo(videoConn),
+		Config: c,
+		DB:     db.InitMysql(&c.DBConf),
+		RDB:    rdb.InitRedis(&c.RDBConf),
+		//VideoRPC: videoclient.NewVideo(videoConn),
 	}
 }

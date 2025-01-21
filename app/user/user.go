@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"zhihu/pkg/interceptors"
 
 	"zhihu/app/user/internal/config"
 	"zhihu/app/user/internal/server"
@@ -36,6 +37,7 @@ func main() {
 			reflection.Register(grpcServer)
 		}
 	})
+	s.AddUnaryInterceptors(interceptors.ServerErrorInterceptor())
 	defer s.Stop()
 
 	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)

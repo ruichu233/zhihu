@@ -2,6 +2,8 @@ package logic
 
 import (
 	"context"
+	"fmt"
+	client "github.com/gorse-io/gorse-go"
 	"github.com/yitter/idgenerator-go/idgen"
 	"gorm.io/gorm"
 	"zhihu/app/video/internal/model"
@@ -52,10 +54,27 @@ func (l *PublishVideoLogic) PublishVideo(in *video.PublishRequest) (*video.Publi
 		//	UserId:                in.AuthorId,
 		//	VideoId:               videoId,
 		//	VideoCreatorTimestamp: videos.CreatedAt.Unix(),
+		//	VideoDescription:      videos.Description,
 		//})
 		//if err != nil {
 		//	return err
 		//}
+		// 向gorse服务发送消息，新建item
+		rowAffected, err := l.svcCtx.Gorse.InsertItem(l.ctx, client.Item{
+			ItemId:     fmt.Sprintf("%d", videoId),
+			Comment:    videos.Description,
+			IsHidden:   false,
+			Categories: []string{},
+			Timestamp:  videos.CreatedAt.Format("2006-01-02 15:04:05"),
+			Labels:     []string{},
+		})
+		if err != nil {
+			return err
+		}
+		if rowAffected.RowAffected <= 0 {
+			logx.Errorf("用户 %d 推送新内容到gorse失败", in.AuthorId)
+		}
+
 		return nil
 	}); err != nil {
 		return nil, err

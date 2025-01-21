@@ -42,6 +42,11 @@ func (s *UserServer) GetUserInfo(ctx context.Context, in *user.UserInfoRequest) 
 	return l.GetUserInfo(in)
 }
 
+func (s *UserServer) GetUserInfoList(ctx context.Context, in *user.UserInfoListRequest) (*user.UserInfoListResponse, error) {
+	l := logic.NewGetUserInfoListLogic(ctx, s.svcCtx)
+	return l.GetUserInfoList(in)
+}
+
 func (s *UserServer) GetUserFollowerList(ctx context.Context, in *user.FollowerListRequest) (*user.FollowerListResponse, error) {
 	l := logic.NewGetUserFollowerListLogic(ctx, s.svcCtx)
 	return l.GetUserFollowerList(in)

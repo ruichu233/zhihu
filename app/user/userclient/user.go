@@ -27,6 +27,8 @@ type (
 	Response               = user.Response
 	SendVerifyCodeRequest  = user.SendVerifyCodeRequest
 	SendVerifyCodeResponse = user.SendVerifyCodeResponse
+	UserInfoListRequest    = user.UserInfoListRequest
+	UserInfoListResponse   = user.UserInfoListResponse
 	UserInfoRequest        = user.UserInfoRequest
 	UserInfoResponse       = user.UserInfoResponse
 
@@ -35,6 +37,7 @@ type (
 		Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 		Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 		GetUserInfo(ctx context.Context, in *UserInfoRequest, opts ...grpc.CallOption) (*UserInfoResponse, error)
+		GetUserInfoList(ctx context.Context, in *UserInfoListRequest, opts ...grpc.CallOption) (*UserInfoListResponse, error)
 		GetUserFollowerList(ctx context.Context, in *FollowerListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error)
 		GetUserFollowedList(ctx context.Context, in *FollowedListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error)
 		SendVerifyCode(ctx context.Context, in *SendVerifyCodeRequest, opts ...grpc.CallOption) (*SendVerifyCodeResponse, error)
@@ -69,6 +72,11 @@ func (m *defaultUser) Register(ctx context.Context, in *RegisterRequest, opts ..
 func (m *defaultUser) GetUserInfo(ctx context.Context, in *UserInfoRequest, opts ...grpc.CallOption) (*UserInfoResponse, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.GetUserInfo(ctx, in, opts...)
+}
+
+func (m *defaultUser) GetUserInfoList(ctx context.Context, in *UserInfoListRequest, opts ...grpc.CallOption) (*UserInfoListResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetUserInfoList(ctx, in, opts...)
 }
 
 func (m *defaultUser) GetUserFollowerList(ctx context.Context, in *FollowerListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error) {

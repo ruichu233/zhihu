@@ -59,7 +59,7 @@ services:
       # Use Redis as cache storage backend.
       GORSE_CACHE_STORE: redis://redis:6379
       # Use MySQL as data storage backend.
-      GORSE_DATA_STORE: mysql://gorse:gorse_pass@tcp(mysql:3306)/gorse?parseTime=true
+      GORSE_DATA_STORE: mysql://root:123456@tcp(mysql:3306)/gorse?parseTime=true
     command: >
       -c /etc/gorse/config.toml
       --log-path /var/log/gorse/master.log

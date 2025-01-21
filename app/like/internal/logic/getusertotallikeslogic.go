@@ -41,7 +41,9 @@ func (l *GetUserTotalLikesLogic) GetUserTotalLikes(in *like.GetUserTotalLikesReq
 		return nil, err
 	}
 	// 2、缓存中没有查询数据，查询数据库
-	if err := l.svcCtx.DB.Model(&model.LikeRecord{}).Where("user_id = ?", in.UserId).Count(&count).Error; err != nil {
+	if err := l.svcCtx.DB.Model(&model.LikeRecord{}).
+		Where("user_id = ?", in.UserId).
+		Count(&count).Error; err != nil {
 		return nil, errors.New("查询点赞总数失败")
 	}
 	// 3、更新缓存

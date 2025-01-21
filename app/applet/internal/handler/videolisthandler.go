@@ -17,8 +17,16 @@ func VideoListHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
+
 		userIdStr := r.Header.Get("user_id")
-		userId, err := strconv.ParseInt(userIdStr, 10, 64)
+		userId := int64(0)
+		var err error
+		if len(userIdStr) > 0 {
+			userId, err = strconv.ParseInt(userIdStr, 10, 64)
+			if err != nil {
+				httpx.ErrorCtx(r.Context(), w, err)
+			}
+		}
 		l := logic.NewVideoListLogic(r.Context(), svcCtx)
 		resp, err := l.VideoList(&req, userId)
 		if err != nil {

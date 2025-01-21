@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"zhihu/pkg/idgenerator"
 
 	"zhihu/app/follow/internal/config"
 	"zhihu/app/follow/internal/server"
@@ -24,6 +25,8 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 	ctx := svc.NewServiceContext(c)
+
+	idgenerator.InitIdGenerator(c.WorkId)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		follow.RegisterFollowServer(grpcServer, server.NewFollowServer(ctx))

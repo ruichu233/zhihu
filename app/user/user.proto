@@ -9,6 +9,7 @@ service User {
   rpc Login(LoginRequest) returns(LoginResponse);
   rpc Register(RegisterRequest) returns(RegisterResponse);
   rpc GetUserInfo(UserInfoRequest) returns(UserInfoResponse);
+  rpc GetUserInfoList(UserInfoListRequest) returns(UserInfoListResponse);
   rpc GetUserFollowerList(FollowerListRequest) returns(FollowerListResponse);
   rpc GetUserFollowedList(FollowedListRequest) returns(FollowerListResponse);
   rpc SendVerifyCode(SendVerifyCodeRequest) returns(SendVerifyCodeResponse);
@@ -56,6 +57,15 @@ message UserInfoResponse {
   int64 follower_count = 5;
   int64 followed_count = 6;
 }
+
+message UserInfoListRequest{
+  repeated int64 user_id_list = 1;
+}
+message UserInfoListResponse {
+  repeated UserInfoResponse user_list = 1;
+}
+
+
 
 message FollowerListRequest {
   int64 user_id = 1;

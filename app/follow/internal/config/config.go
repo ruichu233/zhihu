@@ -8,6 +8,7 @@ import (
 
 type Config struct {
 	zrpc.RpcServerConf
-	DB  db.Conf
-	RDB rdb.Conf
+	DBConf  db.Conf
+	RDBConf rdb.Conf
+	WorkId  uint16
 }

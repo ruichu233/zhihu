@@ -33,7 +33,7 @@ func (l *PublishContentLogic) PublishContent(in *feed.PublishContentRequest) (*f
 	followerList, err := l.svcCtx.FollowRPC.ListFollowers(l.ctx, &follow.GetFollowerListRequest{
 		UserId:   in.UserId,
 		Cursor:   0,
-		PageSize: 0,
+		PageSize: -1,
 		Id:       0,
 	})
 	if err != nil {

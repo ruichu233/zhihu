@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/redis/go-redis/v9"
@@ -10,6 +11,8 @@ import (
 	"zhihu/app/like/internal/svc"
 	"zhihu/app/like/model"
 	"zhihu/app/like/pb/like"
+	"zhihu/app/like/types"
+	"zhihu/pkg/mq"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -36,6 +39,34 @@ func (l *LikeActionLogic) LikeAction(in *like.LikeActionRequest) (*like.LikeActi
 	if err != nil {
 		return nil, err
 	}
+	// 2、判断异常情况
+	switch in.ActionType {
+	case like.LikeActionRequest_LIKE:
+		if isLike {
+			return nil, errors.New("已经点赞过了")
+		}
+	case like.LikeActionRequest_UNLIKE:
+		if !isLike {
+			return nil, errors.New("没有点赞过")
+		}
+	}
+	// 3、投入处理队列
+	value := types.LikeAction{
+		UserId:     in.UserId,
+		BizId:      in.BizId,
+		ObjId:      in.ObjId,
+		ActionType: in.ActionType,
+	}
+	val, err := json.Marshal(&value)
+	if err != nil {
+		return nil, err
+	}
+	_ = l.svcCtx.MQ.Publish("", &mq.MsgEntity{
+		MsgID: "like_action",
+		Key:   LikeActionKey,
+		Val:   string(val),
+	})
+
 	// 2、根据actionType判断是点赞还是取消点赞
 	switch in.ActionType {
 	case like.LikeActionRequest_LIKE:
@@ -63,13 +94,17 @@ func (l *LikeActionLogic) LikeAction(in *like.LikeActionRequest) (*like.LikeActi
 			return nil, errors.New("没有点赞过")
 		} else {
 			// 2、更新数据库
-			err = l.svcCtx.DB.Model(&model.LikeRecord{}).Where("obj_id = ? and biz_id = ? and user_id = ?", in.ObjId, in.BizId, in.UserId).Unscoped().Delete(&model.LikeRecord{}).Error
+			err = l.svcCtx.DB.Model(&model.LikeRecord{}).
+				Where("obj_id = ? and biz_id = ? and user_id = ?", in.ObjId, in.BizId, in.UserId).
+				Delete(&model.LikeRecord{}).Error
 			if err != nil {
 				return nil, err
 			}
 			// 3、更新缓存
+			_ = l.svcCtx.RDB.ZRem(l.ctx, model.GetLikeRecordKey(in.BizId, in.UserId), in.ObjId).Err()
 		}
 	}
+
 	return &like.LikeActionResponse{
 		LikeCount: 0,
 	}, nil
@@ -89,7 +124,9 @@ func IsLike(ctx context.Context, rdb *redis.Client, db *gorm.DB, bizId string, u
 	}
 	// 2、查询数据库获取当前用户对目标是否点赞
 	var likeRecord model.LikeRecord
-	err = db.Model(&model.LikeRecord{}).Unscoped().Where("obj_id = ? and biz_id = ? and user_id = ?", objId, bizId, userId).Limit(1).Find(&likeRecord).Error
+	err = db.Model(&model.LikeRecord{}).
+		Where("obj_id = ? and biz_id = ? and user_id = ?", objId, bizId, userId).
+		Limit(1).Find(&likeRecord).Error
 	if err != nil {
 		return false, err
 	}

@@ -27,4 +27,4 @@ func NewProducer(ctx context.Context, rdb *redis.Client) *Producer {
 	}
 }
 
-var _ mq2.Producer = (*Producer)(nil)
+var _ mq.Producer = (*Producer)(nil)

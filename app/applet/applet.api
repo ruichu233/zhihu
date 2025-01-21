@@ -115,15 +115,36 @@ service applet-api {
 	// 获取视频列表
 	@handler VideoListHandler
 	post /video-list (VideoListRequest) returns (VideoListResponse)
+
+	// 获取用户的作品列表
+	@handler UserVideoListHandler
+	post /user/video-list (UserVideoListRequest) returns (UserVideoListResponse)
+
+	// 获取用户的喜欢列表
+	@handler UserLikeListHandler
+	post /user/like-list (UserLikeListRequest) returns (UserLikeListResponse)
 }
 
 type (
 	VideoListRequest {
-		page     int64 `path:"page"`
-		cursor   int64 `path:"cursor"`
-		feedType int32 `query:"feed_type"`
+		page     int64 `json:"page"`
+		cursor   int64 `json:"cursor"`
+		pageSize int64 `json:"page_size"`
+		feedType int32 `json:"feed_type"`
 	}
 	VideoListResponse {
+		VideoList []VideoInfo `json:"video_list"`
+	}
+	UserVideoListRequest {
+		UserId int64 `json:"user_id"`
+	}
+	UserVideoListResponse {
+		VideoList []VideoInfo `json:"video_list"`
+	}
+	UserLikeListRequest {
+		UserId int64 `json:"user_id"`
+	}
+	UserLikeListResponse {
 		VideoList []VideoInfo `json:"video_list"`
 	}
 )
@@ -133,11 +154,63 @@ type VideoInfo {
 	AuthorId     int64  `json:"author_id"`
 	AuthorName   string `json:"author_name"`
 	AuthorAvatar string `json:"author_avatar"`
-	VideoUrl     string `json:"video_url`
+	VideoUrl     string `json:"video_url"`
 	Title        string `json:"title"`
 	CoverUrl     string `json:"cover_url"`
 	Description  string `json:"description"`
 	CommentCount int64  `json:"comment_count"`
 	LikeCount    int64  `json:"like_count"`
 }
+
+// 评论
+@server (
+	prefix:     /v1/comment
+	middleware: AuthMiddleware,MustLoginMiddleware
+)
+service applet-api {
+	// 评论列表
+	@handler CommentListHandler
+	post /comment-list (CommentListRequest) returns (CommentListResponse)
+
+	// 发布评论
+	@handler CommentPublishHandler
+	post /commment-publish (CommentPublishRequest) returns (CommentPublishResponse)
+
+	// 删除评论
+	@handler CommentDeleteHandler
+	post /delete (CommentDeleteRequest) returns (CommentDeleteResponse)
+}
+
+type (
+	CommentListRequest {
+		VideoId int64 `json:"video_id"`
+	}
+	CommentListResponse {
+		CommentList []CommentInfo `json:"comment_list"`
+	}
+	CommentInfo {
+		CommentId  int64  `json:"comment_id"`
+		UserId     int64  `json:"user_id"`
+		UserName   string `json:"user_name"`
+		UserAvatar string `json:"user_avatar"`
+		Content    string `json:"content"`
+		CreateTime int64  `json:"create_time"`
+		LikeCount  int64  `json:"like_count"`
+		IsLike     bool   `json:"is_like"`
+		ReplyCount int64  `json:"reply_count"`
+	}
+	CommentPublishRequest {
+		VideoId int64  `json:"video_id"`
+		Content string `json:"content"`
+	}
+	CommentPublishResponse {
+		CommentId int64 `json:"comment_id"`
+	}
+	CommentDeleteRequest {
+		CommentId int64 `json:"comment_id"`
+	}
+	CommentDeleteResponse {
+		Status string `json:"status"`
+	}
+)
 

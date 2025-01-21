@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package comment;
+option go_package="./comment";
+
+message Request {
+  string ping = 1;
+}
+
+message Response {
+  string pong = 1;
+}
+
+// 评论服务
+service Comment {
+  rpc Ping(Request) returns(Response);
+  // 获取评论列表
+  rpc GetCommentList(GetCommentListRequest) returns (GetCommentListResponse);
+  // 发布评论
+  rpc PublishComment(PublishCommentRequest) returns (PublishCommentResponse);
+  // 删除评论
+  rpc DeleteComment(DeleteCommentRequest) returns (DeleteCommentResponse);
+}
+message GetCommentListRequest {
+  int64 video_id = 1;
+  int64 user_id = 2;
+}

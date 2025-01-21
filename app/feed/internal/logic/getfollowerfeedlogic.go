@@ -89,7 +89,7 @@ func (l *GetFollowerFeedLogic) cacheFollowerFeed(ctx context.Context, userId int
 		// 1、遍历所有关注的人
 		followListResponse, err := l.svcCtx.FollowRPC.ListFollowing(ctx, &follow.GetFollowListRequest{
 			UserId:   userId,
-			Cursor:   0,
+			Cursor:   -1,
 			PageSize: -1,
 			Id:       0,
 		})

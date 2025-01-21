@@ -23,6 +23,7 @@ const (
 	User_Login_FullMethodName               = "/user.User/Login"
 	User_Register_FullMethodName            = "/user.User/Register"
 	User_GetUserInfo_FullMethodName         = "/user.User/GetUserInfo"
+	User_GetUserInfoList_FullMethodName     = "/user.User/GetUserInfoList"
 	User_GetUserFollowerList_FullMethodName = "/user.User/GetUserFollowerList"
 	User_GetUserFollowedList_FullMethodName = "/user.User/GetUserFollowedList"
 	User_SendVerifyCode_FullMethodName      = "/user.User/SendVerifyCode"
@@ -36,6 +37,7 @@ type UserClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	GetUserInfo(ctx context.Context, in *UserInfoRequest, opts ...grpc.CallOption) (*UserInfoResponse, error)
+	GetUserInfoList(ctx context.Context, in *UserInfoListRequest, opts ...grpc.CallOption) (*UserInfoListResponse, error)
 	GetUserFollowerList(ctx context.Context, in *FollowerListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error)
 	GetUserFollowedList(ctx context.Context, in *FollowedListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error)
 	SendVerifyCode(ctx context.Context, in *SendVerifyCodeRequest, opts ...grpc.CallOption) (*SendVerifyCodeResponse, error)
@@ -89,6 +91,16 @@ func (c *userClient) GetUserInfo(ctx context.Context, in *UserInfoRequest, opts 
 	return out, nil
 }
 
+func (c *userClient) GetUserInfoList(ctx context.Context, in *UserInfoListRequest, opts ...grpc.CallOption) (*UserInfoListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserInfoListResponse)
+	err := c.cc.Invoke(ctx, User_GetUserInfoList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userClient) GetUserFollowerList(ctx context.Context, in *FollowerListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(FollowerListResponse)
@@ -127,6 +139,7 @@ type UserServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	GetUserInfo(context.Context, *UserInfoRequest) (*UserInfoResponse, error)
+	GetUserInfoList(context.Context, *UserInfoListRequest) (*UserInfoListResponse, error)
 	GetUserFollowerList(context.Context, *FollowerListRequest) (*FollowerListResponse, error)
 	GetUserFollowedList(context.Context, *FollowedListRequest) (*FollowerListResponse, error)
 	SendVerifyCode(context.Context, *SendVerifyCodeRequest) (*SendVerifyCodeResponse, error)
@@ -151,6 +164,9 @@ func (UnimplementedUserServer) Register(context.Context, *RegisterRequest) (*Reg
 }
 func (UnimplementedUserServer) GetUserInfo(context.Context, *UserInfoRequest) (*UserInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfo not implemented")
+}
+func (UnimplementedUserServer) GetUserInfoList(context.Context, *UserInfoListRequest) (*UserInfoListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfoList not implemented")
 }
 func (UnimplementedUserServer) GetUserFollowerList(context.Context, *FollowerListRequest) (*FollowerListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserFollowerList not implemented")
@@ -254,6 +270,24 @@ func _User_GetUserInfo_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_GetUserInfoList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserInfoListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetUserInfoList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetUserInfoList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetUserInfoList(ctx, req.(*UserInfoListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _User_GetUserFollowerList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(FollowerListRequest)
 	if err := dec(in); err != nil {
@@ -330,6 +364,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserInfo",
 			Handler:    _User_GetUserInfo_Handler,
+		},
+		{
+			MethodName: "GetUserInfoList",
+			Handler:    _User_GetUserInfoList_Handler,
 		},
 		{
 			MethodName: "GetUserFollowerList",

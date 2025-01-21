@@ -85,11 +85,45 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Route{
 				{
 					Method:  http.MethodPost,
+					Path:    "/user/like-list",
+					Handler: UserLikeListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/user/video-list",
+					Handler: UserVideoListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
 					Path:    "/video-list",
 					Handler: VideoListHandler(serverCtx),
 				},
 			}...,
 		),
 		rest.WithPrefix("/v1/video"),
+	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AuthMiddleware, serverCtx.MustLoginMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/comment-list",
+					Handler: CommentListHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/commment-publish",
+					Handler: CommentPublishHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/delete",
+					Handler: CommentDeleteHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/v1/comment"),
 	)
 }

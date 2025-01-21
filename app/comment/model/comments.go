@@ -1,9 +1,7 @@
-package comment
-
-import "zhihu/pkg/model"
+package model
 
 type Comments struct {
-	model.BaseModel
+	BaseModel
 	BizId         int64  `gorm:"column:biz_id;type:bigint(20);not null" json:"biz_id"`
 	ObjId         int64  `gorm:"column:obj_id;type:bigint(20);not null" json:"obj_id"`
 	ReplyUserId   int64  `gorm:"column:reply_user_id;type:bigint(20);not null" json:"reply_user_id"`
@@ -19,7 +17,7 @@ func (c *Comments) TableName() string {
 }
 
 type CommentCount struct {
-	model.BaseModel
+	BaseModel
 	BizId          int64 `gorm:"column:biz_id;type:bigint(20);not null" json:"biz_id"`
 	ObjId          int64 `gorm:"column:obj_id;type:bigint(20);not null" json:"obj_id"`
 	CommentNum     int64 `gorm:"column:comment_num;type:bigint(20);not null" json:"comment_num"`

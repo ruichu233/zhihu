@@ -1,6 +1,19 @@
 Name: follow.rpc
-ListenOn: 0.0.0.0:8080
+ListenOn: 0.0.0.0:8085
 Etcd:
   Hosts:
   - 127.0.0.1:2379
   Key: follow.rpc
+DBConf:
+  user_name: root
+  password: "123456"
+  host: 127.0.0.1
+  port: "3306"
+  database: follow
+  charset: utf8mb4
+
+RDBConf:
+  addr: 127.0.0.1:6379
+  password: ""
+  db: 0
+WorkId: 1

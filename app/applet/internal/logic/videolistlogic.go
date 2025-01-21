@@ -33,7 +33,7 @@ func (l *VideoListLogic) VideoList(req *types.VideoListRequest, userId int64) (r
 		resp, err := l.svcCtx.FeedRPC.GetFollowerFeed(l.ctx, &feed.GetFollowerFeedRequest{
 			UserId:   userId,
 			Cursor:   req.Cursor,
-			PageSize: req.Page,
+			PageSize: req.PageSize,
 		})
 		if err != nil {
 			return nil, err
@@ -43,8 +43,8 @@ func (l *VideoListLogic) VideoList(req *types.VideoListRequest, userId int64) (r
 	if req.FeedType == 2 {
 		resp, err := l.svcCtx.FeedRPC.GetRecommendedFeed(l.ctx, &feed.GetRecommendedFeedRequest{
 			UserId:   userId,
-			Cursor:   req.Cursor,
-			PageSize: req.Page,
+			Page:     req.Page,
+			PageSize: req.PageSize,
 		})
 		if err != nil {
 			return nil, err
@@ -55,7 +55,6 @@ func (l *VideoListLogic) VideoList(req *types.VideoListRequest, userId int64) (r
 	if len(feedList) > 0 {
 		detailListResp, err := l.svcCtx.VideoRPC.DetailList(l.ctx, &video.DetailListRequest{
 			VideoIds: feedList,
-			FeedType: video.VideoFeedType(req.FeedType),
 		})
 		if err != nil {
 			return nil, err

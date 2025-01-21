@@ -44,15 +44,13 @@ message GetFollowerFeedResponse {
 // 拉取推荐 Feed 的请求
 message GetRecommendedFeedRequest {
   int64 user_id = 1;          // 用户 ID
-  int64 cursor = 2;           // 游标，用于分页拉取
+  int64 page = 2;           // 当前第几页
   int64 page_size = 3;         // 每页大小
 }
 
 // 拉取推荐 Feed 的响应
 message GetRecommendedFeedResponse {
   repeated int64 recommended_items = 1; // 推荐的作品列表
-  int64 next_cursor = 2;      // 下一页的游标
-  bool has_more = 3;           // 是否还有更多内容
 }
 
 // 内容发布事件请求
@@ -60,6 +58,7 @@ message PublishContentRequest {
  int64 user_id = 1;
  int64 video_id = 2;
  int64 video_creator_timestamp = 3;
+ string video_description = 4;
 }
 
 // 内容发布事件响应

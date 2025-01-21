@@ -64,14 +64,14 @@ func (l *FollowActionLogic) FollowAction(in *follow.FollowActionRequest) (*follo
 // 查询数据库中的关注状态
 func (l *FollowActionLogic) checkDBFollowStatus(followerId, followeeId int64) (bool, error) {
 	var f model.Follow
-	err := l.svcCtx.DB.Unscoped().Where("follower_id = ? AND followee_id = ?", followerId, followeeId).First(&f).Error
+	err := l.svcCtx.DB.Where("follower_id = ? AND followee_id = ?", followerId, followeeId).First(&f).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, nil
 		}
 		return false, err
 	}
-	if !f.DeletedAt.Valid {
+	if f.DeletedAt.Valid {
 		return false, nil
 	}
 	return true, nil
@@ -128,14 +128,12 @@ func (l *FollowActionLogic) unfollowUser(followerId, followeeId int64, followKey
 			return fmt.Errorf("database query error: %w", err)
 		}
 
-		if err := tx.Delete(&f).Error; err != nil {
+		if err := tx.Where("id = ?", f.Id).Delete(&f).Error; err != nil {
 			return fmt.Errorf("database save error: %w", err)
 		}
 
 		// 从缓存中移除关注状态
-		if err := l.svcCtx.RDB.ZRem(l.ctx, followKey, followeeId).Err(); err != nil {
-			return fmt.Errorf("redis srem error: %w", err)
-		}
+		_ = l.svcCtx.RDB.ZRem(l.ctx, followKey, followeeId).Err()
 		return nil
 	})
 }

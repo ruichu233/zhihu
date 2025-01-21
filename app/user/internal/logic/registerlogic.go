@@ -62,7 +62,8 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 	u.Email = in.Email
 	u.Password = utils.Md5Crypt(in.Password)
 	u.Username = in.Username
-	err = l.svcCtx.DB.Model(&model.User{}).Create(&u).Error
+	*l.svcCtx.DB.
+		err = l.svcCtx.DB.Model(&model.User{}).Create(&u).Error
 	if err != nil {
 		return nil, err
 	}

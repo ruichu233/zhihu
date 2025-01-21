@@ -78,13 +78,16 @@ func (l *ListFollowersLogic) ListFollowers(in *follow.GetFollowerListRequest) (*
 		createTime := time.Unix(in.Cursor, 0)
 		cacheLen := int(in.PageSize) * 10
 		if err := l.svcCtx.DB.Model(&model.Follow{}).
-			Where("followee_id = ? and created_at <= ?", createTime).Limit(cacheLen).Find(&followers).Error; err != nil {
+			Where("followee_id = ? and created_at <= ?", in.UserId, createTime).Limit(cacheLen).Find(&followers).Error; err != nil {
 			return nil, err
 		}
 		if len(followers) == 0 {
 			return &follow.GetFollowerListResponse{}, nil
 		}
 		var firstPageFollows []*model.Follow
+		if in.PageSize < 0 {
+			in.PageSize = int64(len(followers))
+		}
 		if len(followers) > int(in.PageSize) {
 			firstPageFollows = followers[:in.PageSize]
 		} else {
@@ -170,9 +173,12 @@ func (l *ListFollowersLogic) getFollowersListByIds(userId int64, followerIds []i
 	for _, v := range followerIds {
 		mkeys = append(mkeys, fmt.Sprintf("%d", v))
 	}
-	result, _ := l.svcCtx.RDB.HMGet(l.ctx, key, mkeys...).Result()
+	result := l.svcCtx.RDB.HMGet(l.ctx, key, mkeys...).Val()
 	followSet := make(map[int64]*model.Follow)
 	for _, v := range result {
+		if v == nil {
+			continue
+		}
 		if v == "" {
 			continue
 		}

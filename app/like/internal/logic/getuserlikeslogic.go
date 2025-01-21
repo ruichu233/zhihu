@@ -34,7 +34,7 @@ func (l *GetUserLikesLogic) GetUserLikes(in *like.GetUserLikesRequest) (*like.Ge
 	result, err := l.svcCtx.RDB.ZRangeByScore(l.ctx, key, &redis.ZRangeBy{
 		Min:    "-inf",
 		Max:    "+inf",
-		Count:  10,
+		Count:  -1,
 		Offset: 0,
 	}).Result()
 	if err == nil {
