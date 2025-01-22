@@ -42,9 +42,9 @@ func (l *VideoListLogic) VideoList(req *types.VideoListRequest, userId int64) (r
 	}
 	if req.FeedType == 2 {
 		resp, err := l.svcCtx.FeedRPC.GetRecommendedFeed(l.ctx, &feed.GetRecommendedFeedRequest{
-			UserId:   userId,
-			Page:     req.Page,
-			PageSize: req.PageSize,
+			UserId:   0,
+			Page:     0,
+			PageSize: 10,
 		})
 		if err != nil {
 			return nil, err

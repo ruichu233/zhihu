@@ -1,6 +1,7 @@
 package svc
 
 import (
+	client "github.com/gorse-io/gorse-go"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 	"zhihu/app/user/internal/config"
@@ -17,6 +18,7 @@ type ServiceContext struct {
 	RDB      *redis.Client
 	VideoRPC videoclient.Video
 	UserRPC  userclient.User
+	Gorse    *client.GorseClient
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -31,11 +33,12 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	//		Key:   "video.rpc",
 	//	},
 	//})
-
+	gorse := client.NewGorseClient("http://127.0.0.1:8088", "api_key")
 	return &ServiceContext{
 		Config: c,
 		DB:     db.InitMysql(&c.DBConf),
 		RDB:    rdb.InitRedis(&c.RDBConf),
 		//VideoRPC: videoclient.NewVideo(videoConn),
+		Gorse: gorse,
 	}
 }

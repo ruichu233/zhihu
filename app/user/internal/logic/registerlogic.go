@@ -3,7 +3,9 @@ package logic
 import (
 	"context"
 	"errors"
+	client "github.com/gorse-io/gorse-go"
 	"github.com/yitter/idgenerator-go/idgen"
+	"gorm.io/gorm"
 	"strconv"
 	"zhihu/app/user/model"
 	"zhihu/pkg/token"
@@ -62,11 +64,26 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 	u.Email = in.Email
 	u.Password = utils.Md5Crypt(in.Password)
 	u.Username = in.Username
-	*l.svcCtx.DB.
+	// 5、开启事务保存用户信息
+	l.svcCtx.DB.Session(&gorm.Session{}).Transaction(func(tx *gorm.DB) error {
 		err = l.svcCtx.DB.Model(&model.User{}).Create(&u).Error
-	if err != nil {
-		return nil, err
-	}
+		if err != nil {
+			return err
+		}
+		rowAffected, err := l.svcCtx.Gorse.InsertUser(l.ctx, client.User{
+			UserId:    strconv.FormatInt(u.Id, 10),
+			Labels:    []string{},
+			Subscribe: []string{},
+			Comment:   "",
+		})
+		if err != nil {
+			return err
+		}
+		if rowAffected.RowAffected <= 0 {
+			logx.Errorf("用户 %d 推送到gorse失败", u.Id)
+		}
+		return nil
+	})
 	l.svcCtx.RDB.Del(l.ctx, in.Email)
 	// 5、返回token
 	tokenString, err := token.Sign(strconv.FormatInt(u.Id, 10))

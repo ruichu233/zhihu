@@ -58,7 +58,7 @@ func (l *DetailListLogic) DetailList(in *video.DetailListRequest) (*video.Detail
 	}
 
 	videos := make([]*model.Video, 0, len(noHitIdList))
-	if err := l.svcCtx.DB.Model(&model.Video{}).Where("id in ?", videoSet).Find(&videos).Error; err != nil {
+	if err := l.svcCtx.DB.Model(&model.Video{}).Where("id in ?", noHitIdList).Find(&videos).Error; err != nil {
 		return nil, err
 	}
 	videoItems := make([]*video.VideoFeed, 0, len(videos))

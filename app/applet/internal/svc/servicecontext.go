@@ -1,10 +1,8 @@
 package svc
 
 import (
-	"context"
 	"github.com/redis/go-redis/v9"
 	"github.com/zeromicro/go-zero/core/discov"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/rest"
 	"github.com/zeromicro/go-zero/zrpc"
 	"zhihu/app/applet/internal/config"
@@ -56,22 +54,10 @@ func NewServiceContext(c config.Config) *ServiceContext {
 			Key:   "feed.rpc",
 		},
 	})
-	videoc := video.NewVideoClient(videoConn.Conn())
-	ping, err := videoc.PublishVideo(context.Background(), &video.PublishRequest{
-		AuthorId:    1,
-		CoverUrl:    "",
-		Description: "",
-		Title:       "",
-		VideoUrl:    "",
-	})
-	if err != nil {
-		return nil
-	}
-	logx.Infof("ping: %d", ping.VideoId)
 	return &ServiceContext{
 		Config:   c,
 		UserRPC:  user.NewUserClient(userConn.Conn()),
-		VideoRPC: videoc,
+		VideoRPC: video.NewVideoClient(videoConn.Conn()),
 		//LikeRPC:             likeclient.NewLike(likeConn),
 		FeedRPC:             feedclient.NewFeed(feedConn),
 		AuthMiddleware:      middleware.NewAuthMiddleware().Handle,
