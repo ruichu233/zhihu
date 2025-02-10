@@ -25,9 +25,6 @@ func NewEmailRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ema
 }
 
 func (l *EmailRegisterLogic) EmailRegister(req *types.EmailRegisterRequest) (resp *types.EmailRegisterResponse, err error) {
-	if req.UserName = strings.TrimSpace(req.UserName); len(req.UserName) == 0 {
-		return nil, errors.New("用户名不能为空")
-	}
 	if req.Code = strings.TrimSpace(req.Code); len(req.Code) == 0 {
 		return nil, errors.New("验证码不能为空")
 	}
@@ -37,14 +34,8 @@ func (l *EmailRegisterLogic) EmailRegister(req *types.EmailRegisterRequest) (res
 	if req.Password = strings.TrimSpace(req.Password); len(req.Password) == 0 {
 		return nil, errors.New("密码不能为空")
 	}
-	if req.RePassword = strings.TrimSpace(req.RePassword); len(req.RePassword) == 0 {
-		return nil, errors.New("确认密码不能为空")
-	}
-	if req.Password != req.RePassword {
-		return nil, errors.New("两次密码不一致")
-	}
 	regResp, err := l.svcCtx.UserRPC.Register(l.ctx, &userclient.RegisterRequest{
-		Username: req.UserName,
+		Username: strings.Split(req.Email, "@")[0],
 		Email:    req.Email,
 		Password: req.Password,
 		Code:     req.Code,

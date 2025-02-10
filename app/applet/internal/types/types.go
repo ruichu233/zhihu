@@ -10,15 +10,19 @@ type CommentDeleteResponse struct {
 }
 
 type CommentInfo struct {
-	CommentId  int64  `json:"comment_id"`
-	UserId     int64  `json:"user_id"`
-	UserName   string `json:"user_name"`
-	UserAvatar string `json:"user_avatar"`
-	Content    string `json:"content"`
-	CreateTime int64  `json:"create_time"`
-	LikeCount  int64  `json:"like_count"`
-	IsLike     bool   `json:"is_like"`
-	ReplyCount int64  `json:"reply_count"`
+	Id             int64         `json:"id"`
+	ObjId          int64         `json:"objId"`
+	UserId         int64         `json:"userId"`
+	BeReplayUserId int64         `json:"beReplayUserId"`
+	Nickname       string        `json:"nickname"`
+	Avatar         string        `json:"avatar"`
+	Content        string        `json:"content"`
+	AddTime        int64         `json:"addTime"`
+	LikeNums       int64         `json:"likeNums"`
+	IsLike         uint8         `json:"isLike"`
+	SuperNickname  string        `json:"superNickname"`
+	SuperCommentId int64         `json:"superCommentId"`
+	Children       []CommentInfo `json:"children"`
 }
 
 type CommentListRequest struct {
@@ -30,8 +34,10 @@ type CommentListResponse struct {
 }
 
 type CommentPublishRequest struct {
-	VideoId int64  `json:"video_id"`
-	Content string `json:"content"`
+	VideoId        int64  `json:"video_id"`
+	Content        string `json:"content"`
+	SuperCommentId int64  `json:"superCommentId"`
+	BeReplayUserId int64  `json:"beReplayUserId"`
 }
 
 type CommentPublishResponse struct {
@@ -49,11 +55,9 @@ type EmailLoginResponse struct {
 }
 
 type EmailRegisterRequest struct {
-	UserName   string `json:"name"`
-	Password   string `json:"password"`
-	RePassword string `json:"re_password"`
-	Email      string `json:"email"`
-	Code       string `json:"code"`
+	Password string `json:"password"`
+	Email    string `json:"email"`
+	Code     string `json:"code"`
 }
 
 type EmailRegisterResponse struct {
@@ -88,9 +92,13 @@ type UploadUrlResponse struct {
 }
 
 type UserInfoResponse struct {
-	UserId   int64  `json:"user_id"`
-	UserName string `json:"name"`
-	Email    string `json:"email"`
+	UserId        int64  `json:"user_id"`
+	UserName      string `json:"name"`
+	Email         string `json:"email"`
+	Avatar        string `json:"avatar"`
+	Signature     string `json:"signature"`
+	FollowerCount int64  `json:"follower_count"`
+	FollowedCount int64  `json:"followed_count"`
 }
 
 type UserLikeListRequest struct {

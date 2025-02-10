@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
 	"zhihu/app/applet/internal/logic"
@@ -16,13 +17,21 @@ func CommentPublishHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
-
+		userIdStr := r.Header.Get("user_id")
+		userId, err := strconv.ParseInt(userIdStr, 10, 64)
+		if err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+			return
+		}
 		l := logic.NewCommentPublishLogic(r.Context(), svcCtx)
-		resp, err := l.CommentPublish(&req)
+		resp, err := l.CommentPublish(&req, userId)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {
-			httpx.OkJsonCtx(r.Context(), w, resp)
+			data := map[string]interface{}{
+				"data": resp,
+			}
+			httpx.OkJsonCtx(r.Context(), w, data)
 		}
 	}
 }

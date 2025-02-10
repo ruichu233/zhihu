@@ -29,8 +29,12 @@ func (l *UserInfoLogic) UserInfo(userId int64) (resp *types.UserInfoResponse, er
 		return nil, err
 	}
 	return &types.UserInfoResponse{
-		UserId:   userInfo.Id,
-		UserName: userInfo.Username,
-		Email:    userInfo.Email,
+		UserId:        userInfo.Id,
+		UserName:      userInfo.Username,
+		Email:         userInfo.Email,
+		Avatar:        userInfo.Avatar,
+		Signature:     userInfo.Signature,
+		FollowerCount: userInfo.FollowerCount,
+		FollowedCount: userInfo.FollowedCount,
 	}, nil
 }

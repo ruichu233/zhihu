@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"zhihu/app/comment/commentclient"
 
 	"zhihu/app/applet/internal/svc"
 	"zhihu/app/applet/internal/types"
@@ -24,7 +25,13 @@ func NewCommentDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Com
 }
 
 func (l *CommentDeleteLogic) CommentDelete(req *types.CommentDeleteRequest) (resp *types.CommentDeleteResponse, err error) {
-	// todo: add your logic here and delete this line
-
-	return
+	_, err = l.svcCtx.CommentRPC.DeleteComment(l.ctx, &commentclient.DeleteCommentRequest{
+		Id: req.CommentId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &types.CommentDeleteResponse{
+		Status: "Success",
+	}, nil
 }
