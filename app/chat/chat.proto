@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package comment;
+option go_package="./chat";
+
+message Request {
+  string ping = 1;
+}
+
+message Response {
+  string pong = 1;
+}
+
+// 聊天服务
+service Chat {
+  rpc Ping(Request) returns(Response);
+  rpc GetMassages(GetMassagesRequest) returns(GetMassagesResponse); // 获取聊天记录
+  rpc SendMassage(SendMassageRequest) returns(SendMassageResponse);// 发送信息
+}
+message GetMassagesRequest {
+  int64 user_id = 1;
+  int64 friend_id = 2;
+}
+
+message GetMassagesResponse {
+  repeated MassageInfo massage_list = 1;
+}
+
+message MassageInfo {
+  int64 id = 1;
+  int64 sender_id = 2;
+  int64 receiver_id = 3;
+  string content = 4;
+  int64 create_time = 5;
+}
+message SendMassageRequest {
+  int64 sender_id = 1;
+  int64 receiver_id = 2;
+  string content = 3;
+}
+message SendMassageResponse {
+  int64 id = 1;
+}

@@ -54,8 +54,9 @@ message UserInfoResponse {
   string username = 2;
   string email = 3;
   string avatar = 4;
-  int64 follower_count = 5;
-  int64 followed_count = 6;
+  string signature = 5;
+  int64 follower_count = 6;
+  int64 followed_count = 7;
 }
 
 message UserInfoListRequest{

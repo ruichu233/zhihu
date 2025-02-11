@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"zhihu/app/user/model"
 
 	"zhihu/app/user/internal/svc"
 	"zhihu/app/user/pb/user"
@@ -24,7 +25,24 @@ func NewGetUserInfoListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *G
 }
 
 func (l *GetUserInfoListLogic) GetUserInfoList(in *user.UserInfoListRequest) (*user.UserInfoListResponse, error) {
-	// todo: add your logic here and delete this line
 
-	return &user.UserInfoListResponse{}, nil
+	var userList []*model.User
+	if err := l.svcCtx.DB.Model(&model.User{}).Where("id in ?", in.UserIdList).Find(&userList).Error; err != nil {
+		return nil, err
+	}
+	resp := &user.UserInfoListResponse{}
+	for _, u := range userList {
+		userInfo := &user.UserInfoResponse{
+			Id:            u.Id,
+			Username:      u.Username,
+			Email:         u.Email,
+			Avatar:        u.Avatar,
+			Signature:     u.Signature,
+			FollowerCount: 0,
+			FollowedCount: 0,
+		}
+		resp.UserList = append(resp.UserList, userInfo)
+	}
+
+	return resp, nil
 }

@@ -41,3 +41,8 @@ func (s *FollowServer) ListFollowers(ctx context.Context, in *follow.GetFollower
 	l := logic.NewListFollowersLogic(ctx, s.svcCtx)
 	return l.ListFollowers(in)
 }
+
+func (s *FollowServer) ListFriends(ctx context.Context, in *follow.GetFriendListRequest) (*follow.GetFriendListResponse, error) {
+	l := logic.NewListFriendsLogic(ctx, s.svcCtx)
+	return l.ListFriends(in)
+}

@@ -61,7 +61,7 @@ func (l *LikeActionLogic) LikeAction(in *like.LikeActionRequest) (*like.LikeActi
 	if err != nil {
 		return nil, err
 	}
-	_ = l.svcCtx.MQ.Publish("", &mq.MsgEntity{
+	_ = l.svcCtx.MQP.Publish("", &mq.MsgEntity{
 		MsgID: "like_action",
 		Key:   LikeActionKey,
 		Val:   string(val),

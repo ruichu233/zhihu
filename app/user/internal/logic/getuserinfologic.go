@@ -30,9 +30,13 @@ func (l *GetUserInfoLogic) GetUserInfo(in *user.UserInfoRequest) (*user.UserInfo
 		return nil, err
 	}
 	// 2、根据用户id查询用户关注数和粉丝数
-
 	return &user.UserInfoResponse{
-		Username: u.Username,
-		Email:    u.Email,
+		Id:            u.Id,
+		Username:      u.Username,
+		Email:         u.Email,
+		Avatar:        u.Avatar,
+		Signature:     u.Signature,
+		FollowerCount: 0,
+		FollowedCount: 0,
 	}, nil
 }

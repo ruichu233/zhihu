@@ -2,7 +2,7 @@ package model
 
 type Comments struct {
 	BaseModel
-	BizId         int64  `gorm:"column:biz_id;type:bigint(20);not null" json:"biz_id"`
+	BizId         string `gorm:"column:biz_id;type:varchar(50);not null" json:"biz_id"`
 	ObjId         int64  `gorm:"column:obj_id;type:bigint(20);not null" json:"obj_id"`
 	ReplyUserId   int64  `gorm:"column:reply_user_id;type:bigint(20);not null" json:"reply_user_id"`
 	BeReplyUserId int64  `gorm:"column:be_reply_user_id;type:bigint(20);not null" json:"be_reply_user_id"`
@@ -18,10 +18,10 @@ func (c *Comments) TableName() string {
 
 type CommentCount struct {
 	BaseModel
-	BizId          int64 `gorm:"column:biz_id;type:bigint(20);not null" json:"biz_id"`
-	ObjId          int64 `gorm:"column:obj_id;type:bigint(20);not null" json:"obj_id"`
-	CommentNum     int64 `gorm:"column:comment_num;type:bigint(20);not null" json:"comment_num"`
-	CommentRootNum int64 `gorm:"column:comment_root_num;type:bigint(20);not null" json:"comment_root_num"`
+	BizId          string `gorm:"column:biz_id;type:varchar(50);not null" json:"biz_id"`
+	ObjId          int64  `gorm:"column:obj_id;type:bigint(20);not null" json:"obj_id"`
+	CommentNum     int64  `gorm:"column:comment_num;type:bigint(20);not null" json:"comment_num"`
+	CommentRootNum int64  `gorm:"column:comment_root_num;type:bigint(20);not null" json:"comment_root_num"`
 }
 
 func (c *CommentCount) TableName() string {

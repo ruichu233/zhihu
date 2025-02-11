@@ -22,6 +22,40 @@ service Comment {
   rpc DeleteComment(DeleteCommentRequest) returns (DeleteCommentResponse);
 }
 message GetCommentListRequest {
-  int64 video_id = 1;
-  int64 user_id = 2;
+  string biz_id = 1;
+  int64 obj_id = 2;
+  int64 user_id = 3;
+}
+message GetCommentListResponse {
+  repeated CommentInfo comment_list = 1;
+}
+
+message CommentInfo{
+  int64 id = 1;
+  int64 replay_user_id = 2;
+  int64 be_replay_user_id = 3;
+  string content = 4;
+  int64 like_num = 5;
+  int64 create_time = 6;
+  int64 obj_id = 7;
+  int64 father_id = 8;
+  repeated CommentInfo replay_list = 9;
+}
+message PublishCommentRequest {
+  string biz_id = 1;
+  int64 obj_id = 2;
+  string content = 3;
+  int64 replay_user_id = 4;
+  int64 be_replay_user_id = 5;
+  int64 parent_id = 6;
+}
+message PublishCommentResponse {
+  int64 id = 1;
+}
+
+message DeleteCommentRequest {
+  int64 id = 1;
+}
+message DeleteCommentResponse {
+  bool success = 1;
 }
