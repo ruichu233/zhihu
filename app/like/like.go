@@ -3,8 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"zhihu/pkg/mq"
-
 	"zhihu/app/like/internal/config"
 	"zhihu/app/like/internal/server"
 	"zhihu/app/like/internal/svc"
@@ -25,11 +23,11 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 	ctx := svc.NewServiceContext(c)
-	// mq 处理点赞
-	ctx.MQC.Run(func(msg *mq.MsgEntity) error {
-
-		return nil
-	})
+	//// mq 处理点赞
+	//ctx.MQC.Run(func(msg *mq.MsgEntity) error {
+	//
+	//	return nil
+	//})
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		like.RegisterLikeServer(grpcServer, server.NewLikeServer(ctx))
@@ -38,7 +36,7 @@ func main() {
 			reflection.Register(grpcServer)
 		}
 	})
-	defer ctx.MQC.Close()
+	//defer ctx.MQC.Close()
 	defer s.Stop()
 
 	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)

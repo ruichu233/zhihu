@@ -16,8 +16,6 @@ type (
 	FollowActionRequest     = follow.FollowActionRequest
 	FollowActionResponse    = follow.FollowActionResponse
 	FollowItem              = follow.FollowItem
-	FollowerItem            = follow.FollowerItem
-	FriendItem              = follow.FriendItem
 	GetFollowListRequest    = follow.GetFollowListRequest
 	GetFollowListResponse   = follow.GetFollowListResponse
 	GetFollowerListRequest  = follow.GetFollowerListRequest

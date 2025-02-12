@@ -126,4 +126,23 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		),
 		rest.WithPrefix("/v1/comment"),
 	)
+
+	server.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.AuthMiddleware, serverCtx.MustLoginMiddleware},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/follow-action",
+					Handler: FollowActionHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/follow-list",
+					Handler: ListFollowHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithPrefix("/v1/follow"),
+	)
 }

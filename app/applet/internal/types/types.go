@@ -65,6 +65,21 @@ type EmailRegisterResponse struct {
 	AccessToken string `json:"token"`
 }
 
+type FollowActionRequest struct {
+	FolloweeId int64 `json:"followee_id"`
+	ActionType int32 `json:"action_type"`
+}
+
+type FollowActionResponse struct {
+	Status string `json:"status"`
+}
+
+type FollowInfo struct {
+	UserId   int64  `json:"user_id"`
+	UserName string `json:"user_name"`
+	Avatar   string `json:"avatar"`
+}
+
 type LikeActionRequest struct {
 	ActionType int32  `json:"action_type"`
 	BizId      string `json:"biz_id"`
@@ -73,6 +88,21 @@ type LikeActionRequest struct {
 
 type LikeActionResponse struct {
 	Status string `json:"status"`
+}
+
+type ListFollowRequest struct {
+	UserId     int64 `json:"user_id"`
+	FollowType int32 `json:"follow_type"` // 1 朋友 2 粉丝 3 关注
+	Cursor     int64 `json:"cursor"`
+	PageSize   int64 `json:"page_size"`
+	LastId     int64 `json:"last_id"`
+}
+
+type ListFollowResponse struct {
+	FollowList []FollowInfo `json:"follow_list"`
+	Cursor     int64        `json:"cursor"`
+	IsEnd      bool         `json:"is_end"`
+	LastId     int64        `json:"last_id"`
 }
 
 type PublishHandlerRequest struct {

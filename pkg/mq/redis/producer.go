@@ -12,10 +12,14 @@ type Producer struct {
 }
 
 func (p *Producer) Publish(topic string, msg *mq.MsgEntity) error {
+	toMap, err := msg.TransStructToMap()
+	if err != nil {
+		return err
+	}
 	p.rdb.XAdd(p.ctx, &redis.XAddArgs{
 		Stream: topic,
 		MaxLen: 10000,
-		Values: msg.TransStructToMap(),
+		Values: toMap,
 	})
 	return nil
 }

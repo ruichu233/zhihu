@@ -65,14 +65,15 @@ func (l *ListFollowingLogic) ListFollowing(in *follow.GetFollowListRequest) (*fo
 		for _, v := range follows {
 			curPage = append(curPage, &follow.FollowItem{
 				Id:         v.Id,
-				FolloweeId: v.FolloweeID,
+				UserId:     v.FolloweeID,
 				CreateTime: v.CreatedAt.Unix(),
 			})
 		}
 	} else {
 		defaultCache := 10 * in.PageSize
+		createTime := time.Unix(in.Cursor, 0)
 		if err := l.svcCtx.DB.Model(&model.Follow{}).
-			Where("follower_id = ? AND updated_at <?", in.UserId, cursor).
+			Where("follower_id = ? AND updated_at <?", in.UserId, createTime).
 			Limit(int(defaultCache)).
 			Find(&follows).Error; err != nil {
 			return nil, err
@@ -91,7 +92,7 @@ func (l *ListFollowingLogic) ListFollowing(in *follow.GetFollowListRequest) (*fo
 			followIdList = append(followIdList, f.FolloweeID)
 			curPage = append(curPage, &follow.FollowItem{
 				Id:         f.Id,
-				FolloweeId: f.FolloweeID,
+				UserId:     f.FolloweeID,
 				CreateTime: f.CreatedAt.Unix(),
 			})
 		}
@@ -160,7 +161,7 @@ func (l *ListFollowingLogic) cacheFollowing(key string, cursor, ps int64) ([]int
 
 // 根据id批量查询关注信息
 func (l *ListFollowingLogic) getFollowingsListByIds(userId int64, followingIds []int64) ([]*model.Follow, error) {
-	key := fmt.Sprintf("following:%d", userId)
+	key := fmt.Sprintf("follow_model:%d", userId)
 	mkeys := make([]string, 0, len(followingIds))
 	for _, v := range followingIds {
 		mkeys = append(mkeys, fmt.Sprintf("%d", v))
@@ -168,6 +169,9 @@ func (l *ListFollowingLogic) getFollowingsListByIds(userId int64, followingIds [
 	result, _ := l.svcCtx.RDB.HMGet(l.ctx, key, mkeys...).Result()
 	followSet := make(map[int64]*model.Follow)
 	for _, v := range result {
+		if v == nil {
+			continue
+		}
 		if v == "" {
 			continue
 		}
@@ -189,7 +193,7 @@ func (l *ListFollowingLogic) getFollowingsListByIds(userId int64, followingIds [
 		var list []*model.Follow
 		// 在数据库中查询缓存没有的数据，并且存入缓存
 		err := l.svcCtx.DB.Model(&model.Follow{}).
-			Where("followee_id = ? and follower_id in ?", userId, noHit).
+			Where("followee_id in ? and follower_id = ?", noHit, userId).
 			Find(&list).Error
 		if err != nil {
 			return nil, err

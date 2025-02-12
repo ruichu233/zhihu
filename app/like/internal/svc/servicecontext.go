@@ -21,11 +21,11 @@ type ServiceContext struct {
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	_db := db.InitMysql(&c.DB)
+	_db := db.InitMysql(&c.DBConf)
 	if err := _db.AutoMigrate(&model.LikeRecord{}); err != nil {
 		panic(err)
 	}
-	_rdb := rdb.InitRedis(&c.RDB)
+	_rdb := rdb.InitRedis(&c.RDBConf)
 	return &ServiceContext{
 		Config: c,
 		DB:     _db,

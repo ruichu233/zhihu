@@ -60,7 +60,7 @@ message GetFollowerListRequest {
 }
 
 message GetFollowerListResponse {
-  repeated FollowerItem items = 1;
+  repeated FollowItem items = 1;
   int64 cursor = 2;
   bool isEnd = 3;
   int64 last_id = 4;
@@ -69,13 +69,7 @@ message GetFollowerListResponse {
 message FollowItem{
 
   int64 id = 1;
-  int64 followee_id = 2;//被关注者id
-  int64 create_time = 3;// 关注时间
-}
-
-message FollowerItem{
-  int64 id = 1;
-  int64 follower_id = 2;//关注者id
+  int64 userId = 2;//被关注者id
   int64 create_time = 3;// 关注时间
 }
 
@@ -86,14 +80,8 @@ message GetFriendListRequest {
   int64 id = 4;
 }
 message GetFriendListResponse {
-  repeated FriendItem items = 1;
+  repeated FollowItem items = 1;
   int64 cursor = 2;
   bool isEnd = 3;
   int64 last_id = 4;
-}
-message FriendItem{
-  int64 id = 1;
-  int64 follower_id = 2;//关注者id
-  int64 followee_id = 3;//被关注者id
-  int64 create_time = 4;// 关注时间
 }

@@ -10,6 +10,7 @@ import (
 	"zhihu/app/comment/commentclient"
 	"zhihu/app/comment/pb/comment"
 	"zhihu/app/feed/feedclient"
+	"zhihu/app/follow/followclient"
 	"zhihu/app/like/likeclient"
 	"zhihu/app/like/pb/like"
 	"zhihu/app/user/pb/user"
@@ -26,6 +27,7 @@ type ServiceContext struct {
 	LikeRPC             likeclient.Like
 	FeedRPC             feedclient.Feed
 	CommentRPC          commentclient.Comment
+	FollowRPC           followclient.Follow
 	AuthMiddleware      rest.Middleware
 	MustLoginMiddleware rest.Middleware
 }
@@ -63,6 +65,12 @@ func NewServiceContext(c config.Config) *ServiceContext {
 			Key:   "comment.rpc",
 		},
 	})
+	followConn := zrpc.MustNewClient(zrpc.RpcClientConf{
+		Etcd: discov.EtcdConf{ // 通过 etcd 服务发现时，只需要给 Etcd 配置即可
+			Hosts: []string{"127.0.0.1:2379"},
+			Key:   "follow.rpc",
+		},
+	})
 	return &ServiceContext{
 		Config:              c,
 		UserRPC:             user.NewUserClient(userConn.Conn()),
@@ -70,6 +78,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		LikeRPC:             like.NewLikeClient(likeConn.Conn()),
 		CommentRPC:          comment.NewCommentClient(commentConn.Conn()),
 		FeedRPC:             feedclient.NewFeed(feedConn),
+		FollowRPC:           followclient.NewFollow(followConn),
 		AuthMiddleware:      middleware.NewAuthMiddleware().Handle,
 		MustLoginMiddleware: middleware.NewMustLoginMiddleware().Handle,
 	}

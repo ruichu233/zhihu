@@ -147,3 +147,8 @@ func GetFollowingKey(userId int64) string {
 func GetFollowerKey(userId int64) string {
 	return fmt.Sprintf("follower_%d", userId)
 }
+
+// 获取朋友列表的缓存键
+func GetFriendKey(userId int64) string {
+	return fmt.Sprintf("friend_%d", userId)
+}

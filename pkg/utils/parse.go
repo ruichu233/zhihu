@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"time"
 )
 
 func TransStructToMap(st interface{}) (map[string]interface{}, error) {
@@ -59,4 +60,10 @@ func MapToStruct(data map[string]interface{}, result interface{}) error {
 	}
 
 	return nil
+}
+
+func ParseTimestamp(timestamp int64) string {
+	// 将时间戳转换为时间
+	timeStr := time.Unix(timestamp, 0).Format("2006-01-02 15:04:05")
+	return timeStr
 }

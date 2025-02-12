@@ -222,3 +222,46 @@ type (
 	}
 )
 
+// 关注服务
+@server (
+	prefix:     /v1/follow
+	middleware: AuthMiddleware,MustLoginMiddleware
+)
+service applet-api {
+	// 关注/取消关注
+	@handler FollowActionHandler
+	post /follow-action (FollowActionRequest) returns (FollowActionResponse)
+
+	// 关注列表/ 粉丝列表/ 朋友列表
+	@handler ListFollowHandler
+	post /follow-list (ListFollowRequest) returns (ListFollowResponse)
+}
+
+type (
+	FollowActionRequest {
+		FolloweeId int64 `json:"followee_id"`
+		ActionType int32 `json:"action_type"`
+	}
+	FollowActionResponse {
+		Status string `json:"status"`
+	}
+	ListFollowRequest {
+		UserId     int64 `json:"user_id"`
+		followType int32 `json:"follow_type"` // 1 朋友 2 粉丝 3 关注
+		Cursor     int64 `json:"cursor"`
+		PageSize   int64 `json:"page_size"`
+		LastId     int64 `json:"last_id"`
+	}
+	ListFollowResponse {
+		FollowList []FollowInfo `json:"follow_list"`
+		Cursor     int64        `json:"cursor"`
+		IsEnd      bool         `json:"is_end"`
+		LastId     int64        `json:"last_id"`
+	}
+	FollowInfo {
+		UserId   int64  `json:"user_id"`
+		UserName string `json:"user_name"`
+		Avatar   string `json:"avatar"`
+	}
+)
+

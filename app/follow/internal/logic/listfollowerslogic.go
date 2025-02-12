@@ -45,7 +45,7 @@ func (l *ListFollowersLogic) ListFollowers(in *follow.GetFollowerListRequest) (*
 		lastId, cursor  int64
 		followersIdList []int64
 		followers       []*model.Follow
-		curPage         []*follow.FollowerItem
+		curPage         []*follow.FollowItem
 	)
 	// 构建缓存键
 	key := GetFollowerKey(in.UserId)
@@ -67,9 +67,9 @@ func (l *ListFollowersLogic) ListFollowers(in *follow.GetFollowerListRequest) (*
 		}
 		followers = _followers
 		for _, v := range followers {
-			curPage = append(curPage, &follow.FollowerItem{
+			curPage = append(curPage, &follow.FollowItem{
 				Id:         v.Id,
-				FollowerId: v.FollowerID,
+				UserId:     v.FollowerID,
 				CreateTime: v.CreatedAt.Unix(),
 			})
 		}
@@ -96,9 +96,9 @@ func (l *ListFollowersLogic) ListFollowers(in *follow.GetFollowerListRequest) (*
 		}
 		for _, f := range firstPageFollows {
 			followersIdList = append(followersIdList, f.FollowerID)
-			curPage = append(curPage, &follow.FollowerItem{
+			curPage = append(curPage, &follow.FollowItem{
 				Id:         f.Id,
-				FollowerId: f.FollowerID,
+				UserId:     f.FollowerID,
 				CreateTime: f.CreatedAt.Unix(),
 			})
 		}
@@ -168,7 +168,7 @@ func (l *ListFollowersLogic) cacheFollowers(followKey string, cursor, ps int64) 
 
 // 根据id批量查询粉丝信息
 func (l *ListFollowersLogic) getFollowersListByIds(userId int64, followerIds []int64) ([]*model.Follow, error) {
-	key := fmt.Sprintf("follower:%d", userId)
+	key := fmt.Sprintf("follow_model:%d", userId)
 	mkeys := make([]string, 0, len(followerIds))
 	for _, v := range followerIds {
 		mkeys = append(mkeys, fmt.Sprintf("%d", v))
