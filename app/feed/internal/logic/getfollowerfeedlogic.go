@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/redis/go-redis/v9"
+	"strconv"
 	"time"
 	"zhihu/app/follow/pb/follow"
 	"zhihu/app/video/pb/video"
@@ -99,7 +100,7 @@ func (l *GetFollowerFeedLogic) cacheFollowerFeed(ctx context.Context, userId int
 		// 2、获取作品列表
 		for _, following := range followListResponse.Items {
 			workListResponse, err := l.svcCtx.VideoRPC.WorkList(ctx, &video.WorkListRequest{
-				UserId: following.FolloweeId,
+				UserId: following.UserId,
 			})
 			if err != nil {
 				return nil, err
@@ -125,7 +126,8 @@ func (l *GetFollowerFeedLogic) cacheFollowerFeed(ctx context.Context, userId int
 	feeds := make([]FeedItem, 0, len(res))
 	for _, v := range res {
 		item := FeedItem{}
-		item.Member = v.Member.(int64)
+		parseInt, _ := strconv.ParseInt(v.Member.(string), 10, 64)
+		item.Member = parseInt
 		item.Score = v.Score
 		feeds = append(feeds, item)
 	}

@@ -47,17 +47,17 @@ func (s *UserServer) GetUserInfoList(ctx context.Context, in *user.UserInfoListR
 	return l.GetUserInfoList(in)
 }
 
-func (s *UserServer) GetUserFollowerList(ctx context.Context, in *user.FollowerListRequest) (*user.FollowerListResponse, error) {
-	l := logic.NewGetUserFollowerListLogic(ctx, s.svcCtx)
-	return l.GetUserFollowerList(in)
-}
-
-func (s *UserServer) GetUserFollowedList(ctx context.Context, in *user.FollowedListRequest) (*user.FollowerListResponse, error) {
-	l := logic.NewGetUserFollowedListLogic(ctx, s.svcCtx)
-	return l.GetUserFollowedList(in)
-}
-
 func (s *UserServer) SendVerifyCode(ctx context.Context, in *user.SendVerifyCodeRequest) (*user.SendVerifyCodeResponse, error) {
 	l := logic.NewSendVerifyCodeLogic(ctx, s.svcCtx)
 	return l.SendVerifyCode(in)
+}
+
+func (s *UserServer) UserInfoUpdate(ctx context.Context, in *user.UserInfoUpdateRequest) (*user.UserInfoUpdateResponse, error) {
+	l := logic.NewUserInfoUpdateLogic(ctx, s.svcCtx)
+	return l.UserInfoUpdate(in)
+}
+
+func (s *UserServer) GetAVatarUrl(ctx context.Context, in *user.GetAvatarRequest) (*user.GetAvatarResponse, error) {
+	l := logic.NewGetAVatarUrlLogic(ctx, s.svcCtx)
+	return l.GetAvatarUrl(in)
 }

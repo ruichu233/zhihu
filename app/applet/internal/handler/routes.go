@@ -40,6 +40,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Path:    "/:user_id",
 					Handler: UserInfoHandler(serverCtx),
 				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/:user_id/avatar",
+					Handler: GetAvatarHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/:user_id/update",
+					Handler: UserInfoUpdateHandler(serverCtx),
+				},
 			}...,
 		),
 		rest.WithSignature(serverCtx.Config.Signature),

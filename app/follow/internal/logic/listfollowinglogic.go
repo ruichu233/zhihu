@@ -72,6 +72,9 @@ func (l *ListFollowingLogic) ListFollowing(in *follow.GetFollowListRequest) (*fo
 	} else {
 		defaultCache := 10 * in.PageSize
 		createTime := time.Unix(in.Cursor, 0)
+		if in.Cursor <= 0 {
+			createTime = time.Now()
+		}
 		if err := l.svcCtx.DB.Model(&model.Follow{}).
 			Where("follower_id = ? AND updated_at <?", in.UserId, createTime).
 			Limit(int(defaultCache)).
@@ -82,6 +85,9 @@ func (l *ListFollowingLogic) ListFollowing(in *follow.GetFollowListRequest) (*fo
 			return &follow.GetFollowListResponse{}, nil
 		}
 		var firstPageFollows []*model.Follow
+		if in.PageSize < 0 {
+			in.PageSize = int64(len(follows))
+		}
 		if len(follows) > int(in.PageSize) {
 			firstPageFollows = follows[:in.PageSize]
 		} else {

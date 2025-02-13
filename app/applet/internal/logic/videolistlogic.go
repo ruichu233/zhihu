@@ -5,6 +5,7 @@ import (
 	"zhihu/app/applet/internal/svc"
 	"zhihu/app/applet/internal/types"
 	"zhihu/app/feed/pb/feed"
+	"zhihu/app/like/pb/like"
 	"zhihu/app/user/userclient"
 	"zhihu/app/video/pb/video"
 
@@ -66,6 +67,15 @@ func (l *VideoListLogic) VideoList(req *types.VideoListRequest, userId int64) (r
 			if err != nil {
 				return nil, err
 			}
+			status, err := l.svcCtx.LikeRPC.CheckLikeStatus(l.ctx, &like.CheckLikeStatusRequest{
+				BizId:  "video",
+				ObjId:  videoFeed.VideoId,
+				UserId: userId,
+			})
+			if err != nil {
+				return nil, err
+			}
+
 			videoInfo := types.VideoInfo{
 				VideoId:      videoFeed.VideoId,
 				AuthorId:     videoFeed.AuthorId,
@@ -77,6 +87,7 @@ func (l *VideoListLogic) VideoList(req *types.VideoListRequest, userId int64) (r
 				Description:  videoFeed.Description,
 				CommentCount: videoFeed.CommentCount,
 				LikeCount:    videoFeed.LikeCount,
+				IsLike:       status.IsLiked,
 			}
 			resp.VideoList = append(resp.VideoList, videoInfo)
 		}

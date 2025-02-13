@@ -50,9 +50,7 @@ message CheckLikeStatusRequest {
 }
 
 message CheckLikeStatusResponse {
-  string bizId = 1; // 业务id
-  int64 objId = 2; // 点赞对象id
-  int64 userId  = 3; // 用户id
+  bool is_liked = 1;
 }
 
 message GetPostLikeCountRequest {

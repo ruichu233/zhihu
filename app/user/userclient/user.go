@@ -15,10 +15,8 @@ import (
 type (
 	FindByEmailRequest     = user.FindByEmailRequest
 	FindByEmailResponse    = user.FindByEmailResponse
-	FollowedListRequest    = user.FollowedListRequest
-	FollowedListResponse   = user.FollowedListResponse
-	FollowerListRequest    = user.FollowerListRequest
-	FollowerListResponse   = user.FollowerListResponse
+	GetAvatarRequest       = user.GetAvatarRequest
+	GetAvatarResponse      = user.GetAvatarResponse
 	LoginRequest           = user.LoginRequest
 	LoginResponse          = user.LoginResponse
 	RegisterRequest        = user.RegisterRequest
@@ -31,6 +29,8 @@ type (
 	UserInfoListResponse   = user.UserInfoListResponse
 	UserInfoRequest        = user.UserInfoRequest
 	UserInfoResponse       = user.UserInfoResponse
+	UserInfoUpdateRequest  = user.UserInfoUpdateRequest
+	UserInfoUpdateResponse = user.UserInfoUpdateResponse
 
 	User interface {
 		Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
@@ -38,9 +38,9 @@ type (
 		Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 		GetUserInfo(ctx context.Context, in *UserInfoRequest, opts ...grpc.CallOption) (*UserInfoResponse, error)
 		GetUserInfoList(ctx context.Context, in *UserInfoListRequest, opts ...grpc.CallOption) (*UserInfoListResponse, error)
-		GetUserFollowerList(ctx context.Context, in *FollowerListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error)
-		GetUserFollowedList(ctx context.Context, in *FollowedListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error)
 		SendVerifyCode(ctx context.Context, in *SendVerifyCodeRequest, opts ...grpc.CallOption) (*SendVerifyCodeResponse, error)
+		UserInfoUpdate(ctx context.Context, in *UserInfoUpdateRequest, opts ...grpc.CallOption) (*UserInfoUpdateResponse, error)
+		GetAVatarUrl(ctx context.Context, in *GetAvatarRequest, opts ...grpc.CallOption) (*GetAvatarResponse, error)
 	}
 
 	defaultUser struct {
@@ -79,17 +79,17 @@ func (m *defaultUser) GetUserInfoList(ctx context.Context, in *UserInfoListReque
 	return client.GetUserInfoList(ctx, in, opts...)
 }
 
-func (m *defaultUser) GetUserFollowerList(ctx context.Context, in *FollowerListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error) {
-	client := user.NewUserClient(m.cli.Conn())
-	return client.GetUserFollowerList(ctx, in, opts...)
-}
-
-func (m *defaultUser) GetUserFollowedList(ctx context.Context, in *FollowedListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error) {
-	client := user.NewUserClient(m.cli.Conn())
-	return client.GetUserFollowedList(ctx, in, opts...)
-}
-
 func (m *defaultUser) SendVerifyCode(ctx context.Context, in *SendVerifyCodeRequest, opts ...grpc.CallOption) (*SendVerifyCodeResponse, error) {
 	client := user.NewUserClient(m.cli.Conn())
 	return client.SendVerifyCode(ctx, in, opts...)
+}
+
+func (m *defaultUser) UserInfoUpdate(ctx context.Context, in *UserInfoUpdateRequest, opts ...grpc.CallOption) (*UserInfoUpdateResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.UserInfoUpdate(ctx, in, opts...)
+}
+
+func (m *defaultUser) GetAVatarUrl(ctx context.Context, in *GetAvatarRequest, opts ...grpc.CallOption) (*GetAvatarResponse, error) {
+	client := user.NewUserClient(m.cli.Conn())
+	return client.GetAVatarUrl(ctx, in, opts...)
 }

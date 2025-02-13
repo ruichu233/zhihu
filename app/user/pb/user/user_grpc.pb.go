@@ -19,14 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	User_Ping_FullMethodName                = "/user.User/Ping"
-	User_Login_FullMethodName               = "/user.User/Login"
-	User_Register_FullMethodName            = "/user.User/Register"
-	User_GetUserInfo_FullMethodName         = "/user.User/GetUserInfo"
-	User_GetUserInfoList_FullMethodName     = "/user.User/GetUserInfoList"
-	User_GetUserFollowerList_FullMethodName = "/user.User/GetUserFollowerList"
-	User_GetUserFollowedList_FullMethodName = "/user.User/GetUserFollowedList"
-	User_SendVerifyCode_FullMethodName      = "/user.User/SendVerifyCode"
+	User_Ping_FullMethodName            = "/user.User/Ping"
+	User_Login_FullMethodName           = "/user.User/Login"
+	User_Register_FullMethodName        = "/user.User/Register"
+	User_GetUserInfo_FullMethodName     = "/user.User/GetUserInfo"
+	User_GetUserInfoList_FullMethodName = "/user.User/GetUserInfoList"
+	User_SendVerifyCode_FullMethodName  = "/user.User/SendVerifyCode"
+	User_UserInfoUpdate_FullMethodName  = "/user.User/UserInfoUpdate"
+	User_GetAVatarUrl_FullMethodName    = "/user.User/GetAVatarUrl"
 )
 
 // UserClient is the client API for User service.
@@ -38,9 +38,9 @@ type UserClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	GetUserInfo(ctx context.Context, in *UserInfoRequest, opts ...grpc.CallOption) (*UserInfoResponse, error)
 	GetUserInfoList(ctx context.Context, in *UserInfoListRequest, opts ...grpc.CallOption) (*UserInfoListResponse, error)
-	GetUserFollowerList(ctx context.Context, in *FollowerListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error)
-	GetUserFollowedList(ctx context.Context, in *FollowedListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error)
 	SendVerifyCode(ctx context.Context, in *SendVerifyCodeRequest, opts ...grpc.CallOption) (*SendVerifyCodeResponse, error)
+	UserInfoUpdate(ctx context.Context, in *UserInfoUpdateRequest, opts ...grpc.CallOption) (*UserInfoUpdateResponse, error)
+	GetAVatarUrl(ctx context.Context, in *GetAvatarRequest, opts ...grpc.CallOption) (*GetAvatarResponse, error)
 }
 
 type userClient struct {
@@ -101,30 +101,30 @@ func (c *userClient) GetUserInfoList(ctx context.Context, in *UserInfoListReques
 	return out, nil
 }
 
-func (c *userClient) GetUserFollowerList(ctx context.Context, in *FollowerListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(FollowerListResponse)
-	err := c.cc.Invoke(ctx, User_GetUserFollowerList_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userClient) GetUserFollowedList(ctx context.Context, in *FollowedListRequest, opts ...grpc.CallOption) (*FollowerListResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(FollowerListResponse)
-	err := c.cc.Invoke(ctx, User_GetUserFollowedList_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *userClient) SendVerifyCode(ctx context.Context, in *SendVerifyCodeRequest, opts ...grpc.CallOption) (*SendVerifyCodeResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SendVerifyCodeResponse)
 	err := c.cc.Invoke(ctx, User_SendVerifyCode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) UserInfoUpdate(ctx context.Context, in *UserInfoUpdateRequest, opts ...grpc.CallOption) (*UserInfoUpdateResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserInfoUpdateResponse)
+	err := c.cc.Invoke(ctx, User_UserInfoUpdate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetAVatarUrl(ctx context.Context, in *GetAvatarRequest, opts ...grpc.CallOption) (*GetAvatarResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAvatarResponse)
+	err := c.cc.Invoke(ctx, User_GetAVatarUrl_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -140,9 +140,9 @@ type UserServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	GetUserInfo(context.Context, *UserInfoRequest) (*UserInfoResponse, error)
 	GetUserInfoList(context.Context, *UserInfoListRequest) (*UserInfoListResponse, error)
-	GetUserFollowerList(context.Context, *FollowerListRequest) (*FollowerListResponse, error)
-	GetUserFollowedList(context.Context, *FollowedListRequest) (*FollowerListResponse, error)
 	SendVerifyCode(context.Context, *SendVerifyCodeRequest) (*SendVerifyCodeResponse, error)
+	UserInfoUpdate(context.Context, *UserInfoUpdateRequest) (*UserInfoUpdateResponse, error)
+	GetAVatarUrl(context.Context, *GetAvatarRequest) (*GetAvatarResponse, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -168,14 +168,14 @@ func (UnimplementedUserServer) GetUserInfo(context.Context, *UserInfoRequest) (*
 func (UnimplementedUserServer) GetUserInfoList(context.Context, *UserInfoListRequest) (*UserInfoListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfoList not implemented")
 }
-func (UnimplementedUserServer) GetUserFollowerList(context.Context, *FollowerListRequest) (*FollowerListResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserFollowerList not implemented")
-}
-func (UnimplementedUserServer) GetUserFollowedList(context.Context, *FollowedListRequest) (*FollowerListResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserFollowedList not implemented")
-}
 func (UnimplementedUserServer) SendVerifyCode(context.Context, *SendVerifyCodeRequest) (*SendVerifyCodeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendVerifyCode not implemented")
+}
+func (UnimplementedUserServer) UserInfoUpdate(context.Context, *UserInfoUpdateRequest) (*UserInfoUpdateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserInfoUpdate not implemented")
+}
+func (UnimplementedUserServer) GetAVatarUrl(context.Context, *GetAvatarRequest) (*GetAvatarResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAVatarUrl not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 func (UnimplementedUserServer) testEmbeddedByValue()              {}
@@ -288,42 +288,6 @@ func _User_GetUserInfoList_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_GetUserFollowerList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FollowerListRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServer).GetUserFollowerList(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: User_GetUserFollowerList_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetUserFollowerList(ctx, req.(*FollowerListRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _User_GetUserFollowedList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FollowedListRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServer).GetUserFollowedList(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: User_GetUserFollowedList_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetUserFollowedList(ctx, req.(*FollowedListRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _User_SendVerifyCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SendVerifyCodeRequest)
 	if err := dec(in); err != nil {
@@ -338,6 +302,42 @@ func _User_SendVerifyCode_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServer).SendVerifyCode(ctx, req.(*SendVerifyCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_UserInfoUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserInfoUpdateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UserInfoUpdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_UserInfoUpdate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UserInfoUpdate(ctx, req.(*UserInfoUpdateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_GetAVatarUrl_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAvatarRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetAVatarUrl(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetAVatarUrl_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetAVatarUrl(ctx, req.(*GetAvatarRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -370,16 +370,16 @@ var User_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _User_GetUserInfoList_Handler,
 		},
 		{
-			MethodName: "GetUserFollowerList",
-			Handler:    _User_GetUserFollowerList_Handler,
-		},
-		{
-			MethodName: "GetUserFollowedList",
-			Handler:    _User_GetUserFollowedList_Handler,
-		},
-		{
 			MethodName: "SendVerifyCode",
 			Handler:    _User_SendVerifyCode_Handler,
+		},
+		{
+			MethodName: "UserInfoUpdate",
+			Handler:    _User_UserInfoUpdate_Handler,
+		},
+		{
+			MethodName: "GetAVatarUrl",
+			Handler:    _User_GetAVatarUrl_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

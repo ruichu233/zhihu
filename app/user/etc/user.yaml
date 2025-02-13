@@ -17,3 +17,8 @@ RDBConf:
   password: ""
   db: 0
 WorkId: 1
+OSSConf:
+  endpoint: "127.0.0.1:9000"
+  access_key: 0DITAOzIQbAdu26uSMPr
+  secret_key: Zg3T78ErnSEwdpjkNLjCpmTVu7zsYNeWKMrgsgsb
+  use_ssl: false

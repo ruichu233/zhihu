@@ -2,23 +2,24 @@ package svc
 
 import (
 	client "github.com/gorse-io/gorse-go"
+	"github.com/minio/minio-go/v7"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 	"zhihu/app/user/internal/config"
 	"zhihu/app/user/model"
 	"zhihu/app/user/userclient"
-	"zhihu/app/video/videoclient"
 	"zhihu/pkg/db"
+	"zhihu/pkg/oss"
 	"zhihu/pkg/rdb"
 )
 
 type ServiceContext struct {
-	Config   config.Config
-	DB       *gorm.DB
-	RDB      *redis.Client
-	VideoRPC videoclient.Video
-	UserRPC  userclient.User
-	Gorse    *client.GorseClient
+	Config  config.Config
+	DB      *gorm.DB
+	RDB     *redis.Client
+	UserRPC userclient.User
+	Gorse   *client.GorseClient
+	OSS     *minio.Client
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -38,7 +39,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Config: c,
 		DB:     db.InitMysql(&c.DBConf),
 		RDB:    rdb.InitRedis(&c.RDBConf),
-		//VideoRPC: videoclient.NewVideo(videoConn),
-		Gorse: gorse,
+		OSS:    oss.InitMinio(&c.OSSConf),
+		Gorse:  gorse,
 	}
 }

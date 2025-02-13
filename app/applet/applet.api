@@ -30,6 +30,7 @@ type (
 		Signature     string `json:"signature"`
 		FollowerCount int64  `json:"follower_count"`
 		FollowedCount int64  `json:"followed_count"`
+		IsFollow      bool   `json:"is_follow"`
 	}
 )
 
@@ -57,7 +58,33 @@ service applet-api {
 service applet-api {
 	@handler UserInfoHandler
 	get /:user_id returns (UserInfoResponse)
+
+	@handler UserInfoUpdateHandler
+	post /:user_id/update (UserInfoUpdateRequest) returns (UserInfoUpdateResponse)
+
+	@handler GetAvatarHandler
+	get /:user_id/avatar (GetAvatarRequest) returns (GetAvatarResponse)
 }
+
+type (
+	UserInfoUpdateRequest {
+		UserId      int64  `path:"user_id"`
+		UserName    string `json:"name"`
+		Signature   string `json:"signature"`
+		Avatar      string `json:"avatar"`
+		OldPassword string `json:"old_password"`
+		Password    string `json:"password"`
+	}
+	UserInfoUpdateResponse {
+		status string `json:"status"`
+	}
+	GetAvatarRequest {
+		UserId int64 `path:"user_id"`
+	}
+	GetAvatarResponse {
+		AvatarUrl string `json:"avatar_url"`
+	}
+)
 
 // 点赞
 @server (
@@ -162,6 +189,7 @@ type VideoInfo {
 	Description  string `json:"description"`
 	CommentCount int64  `json:"comment_count"`
 	LikeCount    int64  `json:"like_count"`
+	IsLike       bool   `json:"is_like"`
 }
 
 // 评论

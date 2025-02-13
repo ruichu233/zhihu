@@ -10,9 +10,9 @@ service User {
   rpc Register(RegisterRequest) returns(RegisterResponse);
   rpc GetUserInfo(UserInfoRequest) returns(UserInfoResponse);
   rpc GetUserInfoList(UserInfoListRequest) returns(UserInfoListResponse);
-  rpc GetUserFollowerList(FollowerListRequest) returns(FollowerListResponse);
-  rpc GetUserFollowedList(FollowedListRequest) returns(FollowerListResponse);
   rpc SendVerifyCode(SendVerifyCodeRequest) returns(SendVerifyCodeResponse);
+  rpc UserInfoUpdate(UserInfoUpdateRequest) returns(UserInfoUpdateResponse);
+  rpc GetAVatarUrl(GetAvatarRequest) returns(GetAvatarResponse);
 }
 
 message Request {
@@ -66,20 +66,6 @@ message UserInfoListResponse {
   repeated UserInfoResponse user_list = 1;
 }
 
-
-
-message FollowerListRequest {
-  int64 user_id = 1;
-}
-message FollowerListResponse {
-  repeated UserInfoResponse user_list = 1;
-}
-
-message FollowedListRequest {}
-message FollowedListResponse {
-  repeated UserInfoResponse user_list = 1;
-}
-
 message FindByEmailRequest {
   string email = 1;
 }
@@ -95,4 +81,22 @@ message SendVerifyCodeRequest {
   string email = 1;
 }
 message SendVerifyCodeResponse {
+}
+message UserInfoUpdateRequest {
+  int64 user_id = 1;
+  string username = 2;
+  string avatar = 3;
+  string signature = 4;
+  string old_password = 5;
+  string password = 6;
+}
+message UserInfoUpdateResponse {
+  string message = 1;
+}
+
+message GetAvatarRequest {
+  int64 user_id = 1;
+}
+message GetAvatarResponse {
+  string avatarUrl = 1;
 }

@@ -25,13 +25,11 @@ func NewCheckLikeStatusLogic(ctx context.Context, svcCtx *svc.ServiceContext) *C
 
 // CheckLikeStatus 查询是否对单obj点过赞
 func (l *CheckLikeStatusLogic) CheckLikeStatus(in *like.CheckLikeStatusRequest) (*like.CheckLikeStatusResponse, error) {
-	_, err := IsLike(l.ctx, l.svcCtx.RDB, l.svcCtx.DB, in.BizId, in.UserId, in.ObjId)
+	isLike, err := IsLike(l.ctx, l.svcCtx.RDB, l.svcCtx.DB, in.BizId, in.UserId, in.ObjId)
 	if err != nil {
 		return nil, err
 	}
 	return &like.CheckLikeStatusResponse{
-		BizId:  in.BizId,
-		UserId: in.UserId,
-		ObjId:  in.ObjId,
+		IsLiked: isLike,
 	}, nil
 }

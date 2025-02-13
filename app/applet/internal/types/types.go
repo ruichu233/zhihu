@@ -80,6 +80,14 @@ type FollowInfo struct {
 	Avatar   string `json:"avatar"`
 }
 
+type GetAvatarRequest struct {
+	UserId int64 `path:"user_id"`
+}
+
+type GetAvatarResponse struct {
+	AvatarUrl string `json:"avatar_url"`
+}
+
 type LikeActionRequest struct {
 	ActionType int32  `json:"action_type"`
 	BizId      string `json:"biz_id"`
@@ -129,6 +137,20 @@ type UserInfoResponse struct {
 	Signature     string `json:"signature"`
 	FollowerCount int64  `json:"follower_count"`
 	FollowedCount int64  `json:"followed_count"`
+	IsFollow      bool   `json:"is_follow"`
+}
+
+type UserInfoUpdateRequest struct {
+	UserId      int64  `path:"user_id"`
+	UserName    string `json:"name"`
+	Signature   string `json:"signature"`
+	Avatar      string `json:"avatar"`
+	OldPassword string `json:"old_password"`
+	Password    string `json:"password"`
+}
+
+type UserInfoUpdateResponse struct {
+	Status string `json:"status"`
 }
 
 type UserLikeListRequest struct {
@@ -165,6 +187,7 @@ type VideoInfo struct {
 	Description  string `json:"description"`
 	CommentCount int64  `json:"comment_count"`
 	LikeCount    int64  `json:"like_count"`
+	IsLike       bool   `json:"is_like"`
 }
 
 type VideoListRequest struct {
