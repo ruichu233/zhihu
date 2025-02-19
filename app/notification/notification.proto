@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package notification;
+
+option go_package="./notification";
+
+message NotificationRequest {
+  int64 user_id = 1;
+  int64 page = 2;
+  int64 page_size = 3;
+}
+
+message NotificationResponse {
+  int32 status_code = 1;
+  string status_msg = 2;
+  repeated Notification notifications = 3;
+}
+
+message Notification {
+  int64 id = 1;
+  int64 to_user_id = 2;
+  int64 from_user_id = 3;
+  string content = 4;
+  int32 type = 5;  // 1: 关注通知 2: 点赞通知 3: 评论通知
+  string created_at = 6;
+}
+
+service NotificationService {
+  rpc GetNotifications(NotificationRequest) returns (NotificationResponse);
+}
