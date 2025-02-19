@@ -36,7 +36,7 @@ func (l *GetUserInfoLogic) GetUserInfo(in *user.UserInfoRequest) (*user.UserInfo
 		Email:         u.Email,
 		Avatar:        u.Avatar,
 		Signature:     u.Signature,
-		FollowerCount: 0,
-		FollowedCount: 0,
+		FollowerCount: u.FollowerCount,
+		FollowedCount: u.FollowCount,
 	}, nil
 }
