@@ -293,3 +293,32 @@ type (
 	}
 )
 
+// WebSocket聊天服务
+@server (
+	prefix:     /v1/ws
+	middleware: AuthMiddleware,MustLoginMiddleware
+)
+service applet-api {
+	@handler ChatConnectHandler
+	get /chat/connect
+}
+
+type (
+	ChatMessage {
+		Id         int64  `json:"id"`
+		SenderId   int64  `json:"sender_id"`
+		ReceiverId int64  `json:"receiver_id"`
+		Content    string `json:"content"`
+		CreateTime int64  `json:"create_time"`
+	}
+	ChatRequest {
+		Type       string `json:"type"` // message: 消息, heartbeat: 心跳
+		ReceiverId int64  `json:"receiver_id"` // 接收者ID
+		Content    string `json:"content"` // 消息内容
+	}
+	ChatResponse {
+		Type    string      `json:"type"` // message: 消息, heartbeat: 心跳
+		Message ChatMessage `json:"message"` // 消息内容
+	}
+)
+

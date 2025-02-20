@@ -1,16 +1,22 @@
 Name: notification.rpc
-ListenOn: 0.0.0.0:8085
+ListenOn: 127.0.0.1:8007
+Etcd:
+  Hosts:
+    - 127.0.0.1:2379
+  Key: notification.rpc
 
 Mode: dev
 
-Mysql:
-  DataSource: root:123456@tcp(mysql:3306)/zhihu?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+DBConf:
+  user_name: root
+  password: "123456"
+  host: 127.0.0.1
+  port: "3306"
+  database: follow
+  charset: utf8mb4
 
-CacheRedis:
-  - Host: redis:6379
-    Type: node
-    Pass: ""
-
-Auth:
-  AccessSecret: "zhihu-access-secret"
-  AccessExpire: 86400
+RDBConf:
+  addr: 127.0.0.1:6379
+  password: ""
+  db: 0
+WorkId: 1
