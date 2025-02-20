@@ -61,6 +61,7 @@ message DetailResponse {
   repeated int64 tag_ids = 7;
   int64 comment_count = 8;
   int64 like_count = 9;
+  bool is_liked = 10;
 }
 
 
@@ -74,6 +75,7 @@ message VideoFeed {
   string description = 7;
   int64 comment_count = 8;
   int64 like_count = 9;
+  bool is_liked = 10;
 }
 
 message DetailListRequest{
