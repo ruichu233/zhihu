@@ -4,3 +4,15 @@ Etcd:
   Hosts:
     - 127.0.0.1:2379
   Key: chat.rpc
+DBConf:
+  user_name: root
+  password: "123456"
+  host: 127.0.0.1
+  port: "3306"
+  database: chat
+  charset: utf8mb4
+
+RDBConf:
+  addr: 127.0.0.1:6379
+  password: ""
+  db: 0

@@ -1,7 +1,8 @@
 Name: follow.rpc
 ListenOn: 127.0.0.1:8004
-Etcd:  Hosts:
-    - 127.0.0.1:2379
+Etcd:  
+  Hosts:
+  - 127.0.0.1:2379
   Key: follow.rpc
 DBConf:
   user_name: root

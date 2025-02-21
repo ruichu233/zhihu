@@ -46,10 +46,9 @@ func (q *BatchQueue) Push(data interface{}) {
 
 func (q *BatchQueue) Run(workers int, handler func(batch []interface{}) error) {
 	log.Printf("Starting %d workers for batch queue", workers)
-	defer log.Printf("Stopping %d workers for batch queue", workers)
 	for i := 0; i < workers; i++ {
 		q.wg.Add(1)
-		go func() {
+		go func(workerID int) {
 			defer q.wg.Done()
 			if q.mode == RealTimeMode {
 				// 实时处理模式
@@ -59,7 +58,9 @@ func (q *BatchQueue) Run(workers int, handler func(batch []interface{}) error) {
 						if !ok {
 							return
 						}
-						_ = handler([]interface{}{data})
+						if err := handler([]interface{}{data}); err != nil {
+							log.Printf("Worker %d: Error handling message: %v", workerID, err)
+						}
 					case <-q.ctx.Done():
 						return
 					}
@@ -74,14 +75,17 @@ func (q *BatchQueue) Run(workers int, handler func(batch []interface{}) error) {
 					case data, ok := <-q.ch:
 						if !ok {
 							if len(batch) > 0 {
-								_ = handler(batch)
+								if err := handler(batch); err != nil {
+									log.Printf("Worker %d: Error handling final batch: %v", workerID, err)
+								}
 							}
+							log.Printf("Worker %d: Stopping batch queue", workerID)
 							return
 						}
 						batch = append(batch, data)
 						if len(batch) >= q.batchSize {
 							if err := handler(batch); err != nil {
-								// 这里可以添加错误处理逻辑
+								log.Printf("Worker %d: Error handling batch: %v", workerID, err)
 							}
 							batch = batch[:0]
 							timer.Reset(q.timeout)
@@ -89,21 +93,23 @@ func (q *BatchQueue) Run(workers int, handler func(batch []interface{}) error) {
 					case <-timer.C:
 						if len(batch) > 0 {
 							if err := handler(batch); err != nil {
-								// 这里可以添加错误处理逻辑
+								log.Printf("Worker %d: Error handling timeout batch: %v", workerID, err)
 							}
 							batch = batch[:0]
 						}
 						timer.Reset(q.timeout)
 					case <-q.ctx.Done():
 						if len(batch) > 0 {
-							_ = handler(batch)
+							if err := handler(batch); err != nil {
+								log.Printf("Worker %d: Error handling shutdown batch: %v", workerID, err)
+							}
 						}
+						log.Printf("Worker %d: Stopping due to shutdown", workerID)
 						return
 					}
 				}
 			}
-
-		}()
+		}(i)
 	}
 }
 

@@ -9,7 +9,7 @@ set TIMEOUT=30
 
 :: 启动用户服务
 echo 正在启动 User Service...
-start "User Service" cmd /k "cd app\user && go run user.go -f etc/user.yaml"
+start "User Service" cmd /k "cd app\user && go run . -f etc/user.yaml"
 call :wait_for_service 8000
 
 :: 启动视频服务
@@ -42,10 +42,10 @@ echo 正在启动 Feed Service...
 start "Feed Service" cmd /k "cd app\feed && go run feed.go -f etc/feed.yaml"
 call :wait_for_service 8006
 
-:: 启动通知服务
-echo 正在启动 Notification Service...
-start "Notification Service" cmd /k "cd app\notification && go run notification.go -f etc/notification.yaml"
-call :wait_for_service 8007
+@REM :: 启动通知服务
+@REM echo 正在启动 Notification Service...
+@REM start "Notification Service" cmd /k "cd app\notification && go run notification.go -f etc/notification.yaml"
+@REM call :wait_for_service 8007
 
 :: 最后启动 API 网关
 echo 正在启动 API Gateway...

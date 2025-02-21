@@ -41,8 +41,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	//	},
 	//})
 	kafkaConsumer := kafka.NewReader(kafka.ReaderConfig{ // 创建消费者
-		Brokers:  []string{""},
-		Topic:    "",
+		Brokers:  []string{"127.0.0.1:9092"},
+		Topic:    "user_follow",
 		GroupID:  "",
 		MinBytes: 10e3, // 10KB
 		MaxBytes: 10e6, // 10MB

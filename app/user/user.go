@@ -37,7 +37,7 @@ func main() {
 	InitQueue(ctx.RDB, ctx.DB)
 	defer CloseQueue()
 	// 处理用户的关注数和粉丝数，采用 先更新缓存后异步写入数据库
-	ctx.Consumer.Run(func(msg *mq.MsgEntity) error {
+	go ctx.Consumer.Run(func(msg *mq.MsgEntity) error {
 		var action struct {
 			Action uint8 `json:"action"` //1、关注数 2、粉丝数
 			UserId int64 `json:"userId"`
