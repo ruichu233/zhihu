@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Chat_Ping_FullMethodName        = "/comment.Chat/Ping"
-	Chat_GetMassages_FullMethodName = "/comment.Chat/GetMassages"
-	Chat_SendMassage_FullMethodName = "/comment.Chat/SendMassage"
+	Chat_Ping_FullMethodName        = "/chat.Chat/Ping"
+	Chat_GetMassages_FullMethodName = "/chat.Chat/GetMassages"
+	Chat_SendMassage_FullMethodName = "/chat.Chat/SendMassage"
 )
 
 // ChatClient is the client API for Chat service.
@@ -180,7 +180,7 @@ func _Chat_SendMassage_Handler(srv interface{}, ctx context.Context, dec func(in
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Chat_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "comment.Chat",
+	ServiceName: "chat.Chat",
 	HandlerType: (*ChatServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

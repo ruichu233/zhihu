@@ -8,13 +8,33 @@ cd /d %~dp0
 set TIMEOUT=30
 
 :: 启动用户服务
+echo 正在编译 User Service...
+cd app\user
+go build
+if %errorlevel% neq 0 (
+    echo User Service 编译失败！
+    cd ..\..\
+    pause
+    exit /b 1
+)
 echo 正在启动 User Service...
-start "User Service" cmd /k "cd app\user && go run . -f etc/user.yaml"
+start "User Service" cmd /k ".\user.exe -f etc/user.yaml"
+cd ..\..\
 call :wait_for_service 8000
 
 :: 启动视频服务
+echo 正在编译 Video Service...
+cd app\video
+go build
+if %errorlevel% neq 0 (
+    echo Video Service 编译失败！
+    cd ..\..\
+    pause
+    exit /b 1
+)
 echo 正在启动 Video Service...
-start "Video Service" cmd /k "cd app\video && go run video.go -f etc/video.yaml"
+start "Video Service" cmd /k ".\video.exe -f etc/video.yaml"
+cd ..\..\
 call :wait_for_service 8001
 
 :: 启动点赞服务
@@ -47,9 +67,19 @@ call :wait_for_service 8006
 @REM start "Notification Service" cmd /k "cd app\notification && go run notification.go -f etc/notification.yaml"
 @REM call :wait_for_service 8007
 
-:: 最后启动 API 网关
+:: 启动 API 网关
+echo 正在编译 API Gateway...
+cd app\applet
+go build
+if %errorlevel% neq 0 (
+    echo API Gateway 编译失败！
+    cd ..\..\
+    pause
+    exit /b 1
+)
 echo 正在启动 API Gateway...
-start "API Gateway" cmd /k "cd app\applet && go run applet.go -f etc/applet-api.yaml"
+start "API Gateway" cmd /k ".\applet.exe -f etc/applet-api.yaml"
+cd ..\..\
 call :wait_for_service 8888
 
 echo 所有服务已成功启动！
