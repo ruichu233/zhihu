@@ -5,6 +5,7 @@ import (
 	"zhihu/app/applet/internal/svc"
 	"zhihu/app/applet/internal/types"
 	"zhihu/app/feed/pb/feed"
+	"zhihu/app/follow/pb/follow"
 	"zhihu/app/like/pb/like"
 	"zhihu/app/user/userclient"
 	"zhihu/app/video/pb/video"
@@ -60,6 +61,21 @@ func (l *VideoListLogic) VideoList(req *types.VideoListRequest, userId int64) (r
 		if err != nil {
 			return nil, err
 		}
+		// 获取用户的关注列表
+		followListResp, err := l.svcCtx.FollowRPC.ListFollowing(l.ctx, &follow.GetFollowListRequest{
+			UserId:   userId,
+			Cursor:   0,
+			PageSize: -1,
+			Id:       0,
+		})
+		if err != nil {
+			return nil, err
+		}
+		followMap := make(map[int64]bool)
+		for _, follow := range followListResp.Items {
+			followMap[follow.UserId] = true
+		}
+
 		for _, videoFeed := range detailListResp.VideoFeeds {
 			user, err := l.svcCtx.UserRPC.GetUserInfo(l.ctx, &userclient.UserInfoRequest{
 				UserId: videoFeed.AuthorId,
@@ -77,17 +93,18 @@ func (l *VideoListLogic) VideoList(req *types.VideoListRequest, userId int64) (r
 			}
 
 			videoInfo := types.VideoInfo{
-				VideoId:      videoFeed.VideoId,
-				AuthorId:     videoFeed.AuthorId,
-				AuthorName:   user.Username,
-				AuthorAvatar: user.Avatar,
-				Title:        videoFeed.Title,
-				VideoUrl:     videoFeed.VideoUrl,
-				CoverUrl:     videoFeed.CoverUrl,
-				Description:  videoFeed.Description,
-				CommentCount: videoFeed.CommentCount,
-				LikeCount:    videoFeed.LikeCount,
-				IsLike:       status.IsLiked,
+				VideoId:       videoFeed.VideoId,
+				AuthorId:      videoFeed.AuthorId,
+				AuthorName:    user.Username,
+				AuthorAvatar:  user.Avatar,
+				Title:         videoFeed.Title,
+				VideoUrl:      videoFeed.VideoUrl,
+				CoverUrl:      videoFeed.CoverUrl,
+				Description:   videoFeed.Description,
+				CommentCount:  videoFeed.CommentCount,
+				LikeCount:     videoFeed.LikeCount,
+				IsLike:        status.IsLiked,
+				IsInteraction: followMap[videoFeed.AuthorId],
 			}
 			resp.VideoList = append(resp.VideoList, videoInfo)
 		}

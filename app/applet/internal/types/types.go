@@ -24,8 +24,6 @@ type ChatResponse struct {
 		Content    string `json:"content"`
 		CreateTime int64  `json:"create_time"`
 	} `json:"message"` // 消息内容
-	NikeName string `json:"nickname"`
-	Avatar   string `json:"avatar"`
 }
 
 type CommentDeleteRequest struct {
@@ -204,17 +202,18 @@ type VerificationResponse struct {
 }
 
 type VideoInfo struct {
-	VideoId      int64  `json:"video_id"`
-	AuthorId     int64  `json:"author_id"`
-	AuthorName   string `json:"author_name"`
-	AuthorAvatar string `json:"author_avatar"`
-	VideoUrl     string `json:"video_url"`
-	Title        string `json:"title"`
-	CoverUrl     string `json:"cover_url"`
-	Description  string `json:"description"`
-	CommentCount int64  `json:"comment_count"`
-	LikeCount    int64  `json:"like_count"`
-	IsLike       bool   `json:"is_like"`
+	VideoId       int64  `json:"video_id"`
+	AuthorId      int64  `json:"author_id"`
+	AuthorName    string `json:"author_name"`
+	AuthorAvatar  string `json:"author_avatar"`
+	VideoUrl      string `json:"video_url"`
+	Title         string `json:"title"`
+	CoverUrl      string `json:"cover_url"`
+	Description   string `json:"description"`
+	CommentCount  int64  `json:"comment_count"`
+	LikeCount     int64  `json:"like_count"`
+	IsLike        bool   `json:"is_like"`
+	IsInteraction bool   `json:"is_interaction"`
 }
 
 type VideoListRequest struct {
