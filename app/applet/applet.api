@@ -295,12 +295,11 @@ type (
 
 // WebSocket聊天服务
 @server (
-	prefix:     /v1/ws
-	middleware: AuthMiddleware,MustLoginMiddleware
+	prefix: /v1/ws
 )
 service applet-api {
 	@handler ChatConnectHandler
-	get /chat/connect
+	get /chat/connect/:user_id
 }
 
 type (
@@ -317,8 +316,10 @@ type (
 		Content    string `json:"content"` // 消息内容
 	}
 	ChatResponse {
-		Type    string      `json:"type"` // message: 消息, heartbeat: 心跳
-		Message ChatMessage `json:"message"` // 消息内容
+		Type     string      `json:"type"` // message: 消息, heartbeat: 心跳
+		Message  ChatMessage `json:"message"` // 消息内容
+		NikeName string      `json:"nickname"`
+		Avatar   string      `json:"avatar"`
 	}
 )
 

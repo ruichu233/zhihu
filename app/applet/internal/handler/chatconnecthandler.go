@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"strconv"
 
 	"zhihu/app/applet/internal/logic"
 	"zhihu/app/applet/internal/svc"
@@ -12,14 +11,15 @@ import (
 
 func ChatConnectHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userIdStr := r.Header.Get("user_id")
-		userId, err := strconv.ParseInt(userIdStr, 10, 64)
-		if err != nil {
+		var req struct {
+			UserId int64 `path:"user_id"`
+		}
+		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
-		l := logic.NewChatConnectLogic(r.Context(), svcCtx, w, r, userId)
-		err = l.ChatConnect()
+		l := logic.NewChatConnectLogic(r.Context(), svcCtx, w, r, req.UserId)
+		err := l.ChatConnect()
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

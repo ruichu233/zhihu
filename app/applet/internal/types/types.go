@@ -24,6 +24,8 @@ type ChatResponse struct {
 		Content    string `json:"content"`
 		CreateTime int64  `json:"create_time"`
 	} `json:"message"` // 消息内容
+	NikeName string `json:"nickname"`
+	Avatar   string `json:"avatar"`
 }
 
 type CommentDeleteRequest struct {

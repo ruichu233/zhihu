@@ -27,4 +27,13 @@ message Notification {
 
 service NotificationService {
   rpc GetNotifications(NotificationRequest) returns (NotificationResponse);
+  rpc AddNotification(AddNotificationRequest) returns (NotificationResponse);
+}
+
+message AddNotificationRequest {
+  Notification notification = 1;
+}
+message AddNotificationResponse {
+  int32 status_code = 1;
+  string status_msg = 2;
 }

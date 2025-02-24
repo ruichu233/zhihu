@@ -64,6 +64,7 @@ func (l *RegisterLogic) Register(in *user.RegisterRequest) (*user.RegisterRespon
 	u.Email = in.Email
 	u.Password = utils.Md5Crypt(in.Password)
 	u.Username = in.Username
+	u.Avatar = "https://avatars.githubusercontent.com/u/89794548?v=4"
 	// 5、开启事务保存用户信息
 	l.svcCtx.DB.Session(&gorm.Session{}).Transaction(func(tx *gorm.DB) error {
 		err = l.svcCtx.DB.Model(&model.User{}).Create(&u).Error

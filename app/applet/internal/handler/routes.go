@@ -157,16 +157,13 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	)
 
 	server.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.AuthMiddleware, serverCtx.MustLoginMiddleware},
-			[]rest.Route{
-				{
-					Method:  http.MethodGet,
-					Path:    "/chat/connect",
-					Handler: ChatConnectHandler(serverCtx),
-				},
-			}...,
-		),
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/chat/connect/:user_id",
+				Handler: ChatConnectHandler(serverCtx),
+			},
+		},
 		rest.WithPrefix("/v1/ws"),
 	)
 }

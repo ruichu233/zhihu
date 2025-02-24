@@ -2,7 +2,7 @@ Name: chat.rpc
 ListenOn: 127.0.0.1:8005
 Etcd:
   Hosts:
-    - 127.0.0.1:2379
+  - 127.0.0.1:2379
   Key: chat.rpc
 DBConf:
   user_name: root
@@ -16,3 +16,5 @@ RDBConf:
   addr: 127.0.0.1:6379
   password: ""
   db: 0
+
+WorkId: 1

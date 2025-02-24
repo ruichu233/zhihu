@@ -11,4 +11,5 @@ type Config struct {
 	zrpc.RpcServerConf
 	DBConf  *db.Conf
 	RDBConf *rdb.Conf
+	WorkId  uint16
 }
