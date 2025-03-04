@@ -62,7 +62,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Route{
 				{
 					Method:  http.MethodPost,
-					Path:    "/:video_id/like",
+					Path:    "/:obj_id/like",
 					Handler: LikeActionHandler(serverCtx),
 				},
 			}...,
@@ -141,6 +141,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		rest.WithMiddlewares(
 			[]rest.Middleware{serverCtx.AuthMiddleware, serverCtx.MustLoginMiddleware},
 			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/check-follow",
+					Handler: CheckFollowHandler(serverCtx),
+				},
 				{
 					Method:  http.MethodPost,
 					Path:    "/follow-action",

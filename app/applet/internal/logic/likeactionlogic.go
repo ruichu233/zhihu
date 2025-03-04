@@ -24,11 +24,12 @@ func NewLikeActionLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LikeAc
 	}
 }
 
-func (l *LikeActionLogic) LikeAction(req *types.LikeActionRequest) error {
+func (l *LikeActionLogic) LikeAction(req *types.LikeActionRequest, userId int64) error {
 	_, err := l.svcCtx.LikeRPC.LikeAction(l.ctx, &like.LikeActionRequest{
 		ActionType: like.LikeActionRequest_ActionType(req.ActionType),
 		BizId:      req.BizId,
 		ObjId:      req.ObjId,
+		UserId:     userId,
 	})
 	if err != nil {
 		return err

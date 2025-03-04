@@ -58,7 +58,7 @@ func (q *BatchQueue) Run(workers int, handler func(batch []interface{}) error) {
 						if !ok {
 							return
 						}
-						if err := handler([]interface{}{data}); err != nil {
+						if err := handler([]any{data}); err != nil {
 							log.Printf("Worker %d: Error handling message: %v", workerID, err)
 						}
 					case <-q.ctx.Done():

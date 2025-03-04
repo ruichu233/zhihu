@@ -22,6 +22,8 @@ type (
 	GetFollowerListResponse = follow.GetFollowerListResponse
 	GetFriendListRequest    = follow.GetFriendListRequest
 	GetFriendListResponse   = follow.GetFriendListResponse
+	IsFollowRequest         = follow.IsFollowRequest
+	IsFollowResponse        = follow.IsFollowResponse
 	PingRequest             = follow.PingRequest
 	PingResponse            = follow.PingResponse
 
@@ -31,6 +33,7 @@ type (
 		ListFollowing(ctx context.Context, in *GetFollowListRequest, opts ...grpc.CallOption) (*GetFollowListResponse, error)
 		ListFollowers(ctx context.Context, in *GetFollowerListRequest, opts ...grpc.CallOption) (*GetFollowerListResponse, error)
 		ListFriends(ctx context.Context, in *GetFriendListRequest, opts ...grpc.CallOption) (*GetFriendListResponse, error)
+		IsFollow(ctx context.Context, in *IsFollowRequest, opts ...grpc.CallOption) (*IsFollowResponse, error)
 	}
 
 	defaultFollow struct {
@@ -67,4 +70,9 @@ func (m *defaultFollow) ListFollowers(ctx context.Context, in *GetFollowerListRe
 func (m *defaultFollow) ListFriends(ctx context.Context, in *GetFriendListRequest, opts ...grpc.CallOption) (*GetFriendListResponse, error) {
 	client := follow.NewFollowClient(m.cli.Conn())
 	return client.ListFriends(ctx, in, opts...)
+}
+
+func (m *defaultFollow) IsFollow(ctx context.Context, in *IsFollowRequest, opts ...grpc.CallOption) (*IsFollowResponse, error) {
+	client := follow.NewFollowClient(m.cli.Conn())
+	return client.IsFollow(ctx, in, opts...)
 }

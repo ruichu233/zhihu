@@ -38,13 +38,14 @@ func main() {
 	defer CloseQueue()
 	// 处理用户的关注数和粉丝数，采用 先更新缓存后异步写入数据库
 	go ctx.Consumer.Run(func(msg *mq.MsgEntity) error {
-		var action struct {
+		type actionT struct {
 			Action uint8 `json:"action"` //1、关注数 2、粉丝数
 			UserId int64 `json:"userId"`
 			Type   uint8 `json:"type"` // 1、增加 2、减少
 		}
+		var action actionT
 		if err := json.Unmarshal([]byte(msg.Val), &action); err != nil {
-			return err
+			return fmt.Errorf("解析消息失败: %v:%v", err, msg)
 		}
 		// 根据 action.Action 和 action.Type 更新数据库
 		var user model.User
@@ -72,9 +73,6 @@ func main() {
 				}
 				return fmt.Errorf("查询数据库失败: %v", err)
 			}
-			// 更新缓存
-			userJson, _ := json.Marshal(user)
-			ctx.RDB.Set(context.Background(), model.GetUserInfoKey(action.UserId), string(userJson), time.Hour*24)
 		}
 
 		switch action.Action {
@@ -93,6 +91,9 @@ func main() {
 				user.FollowerCount--
 			}
 		}
+		// 更新缓存
+		userJson, _ := json.Marshal(user)
+		ctx.RDB.Set(context.Background(), model.GetUserInfoKey(action.UserId), string(userJson), time.Hour*24)
 
 		// 投入本地队列处理
 		UserQueue.Push(user.Id)

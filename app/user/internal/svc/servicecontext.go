@@ -2,27 +2,26 @@ package svc
 
 import (
 	"context"
-	client "github.com/gorse-io/gorse-go"
-	"github.com/minio/minio-go/v7"
-	"github.com/redis/go-redis/v9"
-	"github.com/segmentio/kafka-go"
-	"gorm.io/gorm"
 	"time"
 	"zhihu/app/user/internal/config"
 	"zhihu/app/user/model"
-	"zhihu/app/user/userclient"
 	"zhihu/pkg/db"
 	"zhihu/pkg/mq"
 	_kafka "zhihu/pkg/mq/kafka"
 	"zhihu/pkg/oss"
 	"zhihu/pkg/rdb"
+
+	client "github.com/gorse-io/gorse-go"
+	"github.com/minio/minio-go/v7"
+	"github.com/redis/go-redis/v9"
+	"github.com/segmentio/kafka-go"
+	"gorm.io/gorm"
 )
 
 type ServiceContext struct {
 	Config   config.Config
 	DB       *gorm.DB
 	RDB      *redis.Client
-	UserRPC  userclient.User
 	Gorse    *client.GorseClient
 	OSS      *minio.Client
 	Consumer mq.Consumer
@@ -43,7 +42,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	kafkaConsumer := kafka.NewReader(kafka.ReaderConfig{ // 创建消费者
 		Brokers:  []string{"127.0.0.1:9092"},
 		Topic:    "user_follow",
-		GroupID:  "",
+		GroupID:  "user_follow_1",
 		MinBytes: 10e3, // 10KB
 		MaxBytes: 10e6, // 10MB
 		MaxWait:  time.Second * 1,

@@ -2,11 +2,13 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
-	"github.com/zeromicro/go-zero/rest/httpx"
 	"zhihu/app/applet/internal/logic"
 	"zhihu/app/applet/internal/svc"
 	"zhihu/app/applet/internal/types"
+
+	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 func LikeActionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
@@ -17,8 +19,15 @@ func LikeActionHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
+		userIdStr := r.Header.Get("user_id")
+		userId, err := strconv.ParseInt(userIdStr, 10, 64)
+		if err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+			return
+		}
+
 		l := logic.NewLikeActionLogic(r.Context(), svcCtx)
-		err := l.LikeAction(&req)
+		err = l.LikeAction(&req, userId)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

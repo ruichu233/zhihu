@@ -11,6 +11,7 @@ service Follow {
   rpc ListFollowing(GetFollowListRequest) returns(GetFollowListResponse);  // 获取关注列表
   rpc ListFollowers(GetFollowerListRequest) returns(GetFollowerListResponse);  // 获取粉丝列表
   rpc ListFriends(GetFriendListRequest) returns(GetFriendListResponse);// 获取好友列表
+  rpc IsFollow(IsFollowRequest) returns(IsFollowResponse); // 判断是否关注
 }
 
 // 消息定义
@@ -84,4 +85,14 @@ message GetFriendListResponse {
   int64 cursor = 2;
   bool isEnd = 3;
   int64 last_id = 4;
+}
+
+
+message IsFollowRequest{
+  int64 user_id = 1;  // 请求判断的用户的ID
+  int64 to_user_id = 2;  // 要判断的用户的ID
+}
+
+message IsFollowResponse{
+  bool is_follow = 1;  // 是否关注
 }

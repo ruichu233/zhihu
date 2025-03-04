@@ -20,7 +20,7 @@ WorkId: 1
 
 OSSConf:
   endpoint: "127.0.0.1:9000"
-  access_key: 0DITAOzIQbAdu26uSMPr
-  secret_key: Zg3T78ErnSEwdpjkNLjCpmTVu7zsYNeWKMrgsgsb
+  access_key: 0fyBGegXKBE2MNw759Gh
+  secret_key: SMYtoXe006LBycTFTEULlcitCImDuJQOxwose8Wq
   use_ssl: false
 

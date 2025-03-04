@@ -2,7 +2,6 @@ package kafka
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"zhihu/pkg/mq"
 
@@ -41,16 +40,13 @@ func (c *Consumer) Run(handler func(msg *mq.MsgEntity) error) {
 			return
 		default:
 		}
-		msg, err := c.client.ReadMessage(c.ctx)
+		msg, err := c.client.FetchMessage(c.ctx)
 		if err != nil {
 			log.Printf("Error reading message: %v", err)
 			continue
 		}
 		var msgEntity mq.MsgEntity
-		if err := json.Unmarshal(msg.Value, &msgEntity); err != nil {
-			log.Printf("Error unmarshaling message: %v", err)
-			continue
-		}
+		msgEntity.Val = string(msg.Value)
 		if err := handler(&msgEntity); err != nil {
 			log.Printf("Handler error for message %v: %v", msg.Offset, err)
 			continue

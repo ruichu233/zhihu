@@ -3,9 +3,10 @@ package logic
 import (
 	"context"
 	"errors"
-	"github.com/redis/go-redis/v9"
 	"strconv"
 	"zhihu/app/like/model"
+
+	"github.com/redis/go-redis/v9"
 
 	"zhihu/app/like/internal/svc"
 	"zhihu/app/like/pb/like"
@@ -30,33 +31,33 @@ func NewGetUserLikesLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetU
 // 查询某个用户的点赞列表
 func (l *GetUserLikesLogic) GetUserLikes(in *like.GetUserLikesRequest) (*like.GetUserLikesResponse, error) {
 	// 1、查询缓存
-	key := model.GetLikeRecordKey("video", in.UserId)
-	result, err := l.svcCtx.RDB.ZRangeByScore(l.ctx, key, &redis.ZRangeBy{
+	key := model.GetLikeRecordKey("video_like", in.UserId)
+	result, _ := l.svcCtx.RDB.ZRangeByScore(l.ctx, key, &redis.ZRangeBy{
 		Min:    "-inf",
 		Max:    "+inf",
 		Count:  -1,
 		Offset: 0,
 	}).Result()
-	if err == nil {
+	if len(result) > 0 {
 		postIds := make([]int64, 0, len(result))
 		for _, v := range result {
-			id, err := strconv.ParseInt(v, 10, 64)
-			if err != nil {
-				return nil, err
+			if v == "" {
+				continue
 			}
-			postIds = append(postIds, id)
+			if v == "-1" {
+				continue
+			}
+			objId, _ := strconv.ParseInt(v, 10, 64)
+			postIds = append(postIds, objId)
 		}
 		return &like.GetUserLikesResponse{
 			PostIds: postIds,
 		}, nil
 	}
-	if !errors.Is(err, redis.Nil) {
-		return nil, err
-	}
 	// 2、查询缓存失败，查询数据库
 	posts := make([]*model.LikeRecord, 0)
 	if err := l.svcCtx.DB.Model(&model.LikeRecord{}).Find(&posts, &model.LikeRecord{
-		BizId:  "video",
+		BizId:  "video_like",
 		UserId: in.UserId,
 	}); err != nil {
 		return nil, errors.New("查询点赞列表失败")

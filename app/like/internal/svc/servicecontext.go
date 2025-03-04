@@ -2,20 +2,21 @@ package svc
 
 import (
 	"context"
-	v9 "github.com/redis/go-redis/v9"
-	"gorm.io/gorm"
 	"zhihu/app/like/internal/config"
 	"zhihu/app/like/model"
 	"zhihu/pkg/db"
 	"zhihu/pkg/mq"
-	"zhihu/pkg/mq/redis"
+	_redis "zhihu/pkg/mq/redis"
 	"zhihu/pkg/rdb"
+
+	"github.com/redis/go-redis/v9"
+	"gorm.io/gorm"
 )
 
 type ServiceContext struct {
 	Config config.Config
 	DB     *gorm.DB
-	RDB    *v9.Client
+	RDB    *redis.Client
 	MQP    mq.Producer
 	MQC    mq.Consumer
 }
@@ -30,7 +31,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Config: c,
 		DB:     _db,
 		RDB:    _rdb,
-		MQP:    redis.NewProducer(context.Background(), _rdb),
-		MQC:    redis.NewConsumer(context.Background(), _rdb, "like", "1", "1"),
+		MQP:    _redis.NewProducer(context.Background(), _rdb),
+		MQC:    _redis.NewConsumer(context.Background(), _rdb, "like", "1", "1"),
 	}
 }

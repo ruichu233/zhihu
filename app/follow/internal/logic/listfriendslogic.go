@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/redis/go-redis/v9"
-	"gorm.io/gorm"
 	"strconv"
 	"time"
 	"zhihu/app/follow/internal/svc"
 	"zhihu/app/follow/model"
 	"zhihu/app/follow/pb/follow"
 	"zhihu/pkg/utils"
+
+	"github.com/redis/go-redis/v9"
+	"gorm.io/gorm"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -113,12 +114,14 @@ func (l *ListFriendsLogic) ListFriends(in *follow.GetFriendListRequest) (*follow
 	// 构建缓存
 	if !isCache {
 		go func() {
+			// 创建新的上下文
+			ctx := context.Background()
 			if len(follows) < int(10*in.PageSize) && len(follows) > 0 {
 				follows = append(follows, &model.Follow{
 					FollowerID: -1,
 				})
 				for _, v := range follows {
-					l.svcCtx.RDB.ZAdd(l.ctx, friendKey, redis.Z{
+					l.svcCtx.RDB.ZAdd(ctx, friendKey, redis.Z{
 						Score:  float64(v.UpdatedAt.Unix()),
 						Member: v.FollowerID,
 					})

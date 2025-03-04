@@ -80,7 +80,7 @@ if %errorlevel% neq 0 (
 echo 正在启动 API Gateway...
 start "API Gateway" cmd /k ".\applet.exe -f etc/applet-api.yaml"
 cd ..\..\
-call :wait_for_service 8888
+call :wait_for_service 8080
 
 echo 所有服务已成功启动！
 pause

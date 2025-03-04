@@ -46,3 +46,8 @@ func (s *FollowServer) ListFriends(ctx context.Context, in *follow.GetFriendList
 	l := logic.NewListFriendsLogic(ctx, s.svcCtx)
 	return l.ListFriends(in)
 }
+
+func (s *FollowServer) IsFollow(ctx context.Context, in *follow.IsFollowRequest) (*follow.IsFollowResponse, error) {
+	l := logic.NewIsFollowLogic(ctx, s.svcCtx)
+	return l.IsFollow(in)
+}

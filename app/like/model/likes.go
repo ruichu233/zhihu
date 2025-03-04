@@ -31,5 +31,9 @@ func GetLikeRecordKey(bizId string, userId int64) string {
 }
 
 func GetLikeCountKey(bizId string, objId int64) string {
-	return fmt.Sprintf("count:patten:%d:%s", objId, bizId)
+	return fmt.Sprintf("count:patten:%s:%d", bizId, objId)
+}
+
+func LockKey(biz string, objId int64) string {
+	return fmt.Sprintf("lock:patten:%d:%s", objId, biz)
 }

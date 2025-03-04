@@ -84,7 +84,7 @@ func (l *VideoListLogic) VideoList(req *types.VideoListRequest, userId int64) (r
 				return nil, err
 			}
 			status, err := l.svcCtx.LikeRPC.CheckLikeStatus(l.ctx, &like.CheckLikeStatusRequest{
-				BizId:  "video",
+				BizId:  "video_like",
 				ObjId:  videoFeed.VideoId,
 				UserId: userId,
 			})

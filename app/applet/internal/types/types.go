@@ -26,6 +26,15 @@ type ChatResponse struct {
 	} `json:"message"` // 消息内容
 }
 
+type CheckFollowRequest struct {
+	UserId   int64 `json:"user_id"`
+	ToUserId int64 `json:"to_user_id"`
+}
+
+type CheckFollowResponse struct {
+	IsFollow bool `json:"is_follow"`
+}
+
 type CommentDeleteRequest struct {
 	CommentId int64 `json:"comment_id"`
 }

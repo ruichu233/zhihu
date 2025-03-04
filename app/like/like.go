@@ -3,10 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	cronjob "zhihu/app/like/cron_job"
 	"zhihu/app/like/internal/config"
 	"zhihu/app/like/internal/server"
 	"zhihu/app/like/internal/svc"
+	"zhihu/app/like/local_queue"
 	"zhihu/app/like/pb/like"
+	"zhihu/pkg/idgenerator"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
@@ -23,11 +26,15 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 	ctx := svc.NewServiceContext(c)
-	//// mq 处理点赞
-	//ctx.MQC.Run(func(msg *mq.MsgEntity) error {
-	//
-	//	return nil
-	//})
+
+	// 处理点赞消息
+	local_queue.InitQueue(ctx.RDB, ctx.DB)
+	defer local_queue.CloseQueue()
+	// 定时任务
+	cronjob.Init(ctx.RDB, ctx.DB)
+
+	// ID生成器初始化
+	idgenerator.InitIdGenerator(c.WorkId)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		like.RegisterLikeServer(grpcServer, server.NewLikeServer(ctx))
@@ -36,7 +43,7 @@ func main() {
 			reflection.Register(grpcServer)
 		}
 	})
-	//defer ctx.MQC.Close()
+
 	defer s.Stop()
 
 	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)

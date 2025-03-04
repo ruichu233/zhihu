@@ -2,15 +2,18 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/redis/go-redis/v9"
-	"github.com/yitter/idgenerator-go/idgen"
-	"gorm.io/gorm"
 	"time"
 	"zhihu/app/follow/internal/svc"
 	"zhihu/app/follow/model"
 	"zhihu/app/follow/pb/follow"
+	"zhihu/pkg/mq"
+
+	"github.com/redis/go-redis/v9"
+	"github.com/yitter/idgenerator-go/idgen"
+	"gorm.io/gorm"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,7 +32,7 @@ func NewFollowActionLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Foll
 	}
 }
 func (l *FollowActionLogic) FollowAction(in *follow.FollowActionRequest) (*follow.FollowActionResponse, error) {
-	// 构建缓存键
+	// 构建关注列表缓存键
 	followKey := GetFollowingKey(in.FollowerId)
 
 	// 查询数据库中的关注状态
@@ -87,13 +90,7 @@ func (l *FollowActionLogic) followUser(followerId, followeeId int64, followKey s
 	}
 
 	return l.svcCtx.DB.Transaction(func(tx *gorm.DB) error {
-		defer func() {
-			if r := recover(); r != nil {
-				tx.Rollback()
-			}
-		}()
-
-		// 检查数据库中是否有记录
+		// 1. 先写入数据库
 		f := model.Follow{
 			BaseModel: model.BaseModel{
 				Id: idgen.NextId(),
@@ -101,20 +98,57 @@ func (l *FollowActionLogic) followUser(followerId, followeeId int64, followKey s
 			FollowerID: followerId,
 			FolloweeID: followeeId,
 		}
-		// 保存关注状态到数据库
-		if err := tx.Save(&f).Error; err != nil {
-			tx.Rollback()
+		if err := tx.Create(&f).Error; err != nil {
 			return fmt.Errorf("database save error: %w", err)
 		}
-		// 更新缓存
-		if err := l.svcCtx.RDB.ZAdd(l.ctx, followKey, redis.Z{
-			Member: followeeId,
-			Score:  float64(time.Now().Unix()),
-		}).Err(); err != nil {
-			tx.Rollback()
-			return fmt.Errorf("redis sadd error: %w", err)
-		}
-
+		// 2. 异步更新缓存，即使缓存更新失败也不影响事务
+		go func() {
+			pipe := l.svcCtx.RDB.Pipeline()
+			now := float64(time.Now().Unix())
+			// 更新关注列表
+			pipe.ZAdd(l.ctx, followKey, redis.Z{
+				Member: followeeId,
+				Score:  now,
+			})
+			// 更新粉丝列表
+			followerKey := GetFollowerKey(followeeId)
+			pipe.ZAdd(l.ctx, followerKey, redis.Z{
+				Member: followerId,
+				Score:  now,
+			})
+			_, _ = pipe.Exec(l.ctx)
+		}()
+		// 3. 异步发送mq
+		// 3. 异步发送mq
+		go func() {
+			type action struct {
+				Action uint8 `json:"action"` //1、关注数 2、粉丝数
+				UserId int64 `json:"userId"`
+				Type   uint8 `json:"type"` // 1、增加 2、减少
+			}
+			action1 := action{
+				Action: 1,
+				UserId: followerId,
+				Type:   1,
+			}
+			action2 := action{
+				Action: 2,
+				UserId: followeeId,
+				Type:   1,
+			}
+			action1Json, _ := json.Marshal(action1)
+			action2Json, _ := json.Marshal(action2)
+			l.svcCtx.Prod.Publish("", &mq.MsgEntity{
+				MsgID: "",
+				Key:   "",
+				Val:   string(action1Json),
+			})
+			l.svcCtx.Prod.Publish("", &mq.MsgEntity{
+				MsgID: "",
+				Key:   "",
+				Val:   string(action2Json),
+			})
+		}()
 		return nil
 	})
 }
@@ -134,6 +168,41 @@ func (l *FollowActionLogic) unfollowUser(followerId, followeeId int64, followKey
 
 		// 从缓存中移除关注状态
 		_ = l.svcCtx.RDB.ZRem(l.ctx, followKey, followeeId).Err()
+		_ = l.svcCtx.RDB.ZRem(l.ctx, GetFollowerKey(followeeId), followerId).Err()
+		_ = l.svcCtx.RDB.ZRem(l.ctx, GetFriendKey(followerId), followeeId).Err()
+		_ = l.svcCtx.RDB.ZRem(l.ctx, GetFriendKey(followeeId), followerId).Err()
+		_ = l.svcCtx.RDB.HDel(l.ctx, fmt.Sprintf("follow_model:%d", followeeId), fmt.Sprintf("%d", followerId)).Err()
+
+		// 3. 异步发送mq
+		go func() {
+			type action struct {
+				Action uint8 `json:"action"` //1、关注数 2、粉丝数
+				UserId int64 `json:"userId"`
+				Type   uint8 `json:"type"` // 1、增加 2、减少
+			}
+			action1 := action{
+				Action: 1,
+				UserId: followerId,
+				Type:   2,
+			}
+			action2 := action{
+				Action: 2,
+				UserId: followeeId,
+				Type:   2,
+			}
+			action1Json, _ := json.Marshal(action1)
+			action2Json, _ := json.Marshal(action2)
+			l.svcCtx.Prod.Publish("", &mq.MsgEntity{
+				MsgID: "",
+				Key:   "",
+				Val:   string(action1Json),
+			})
+			l.svcCtx.Prod.Publish("", &mq.MsgEntity{
+				MsgID: "",
+				Key:   "",
+				Val:   string(action2Json),
+			})
+		}()
 		return nil
 	})
 }

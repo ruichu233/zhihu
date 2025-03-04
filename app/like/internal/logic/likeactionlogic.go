@@ -2,17 +2,16 @@ package logic
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"github.com/redis/go-redis/v9"
-	"gorm.io/gorm"
-	"time"
+	"sync"
 	"zhihu/app/like/internal/svc"
+	"zhihu/app/like/local_queue"
 	"zhihu/app/like/model"
 	"zhihu/app/like/pb/like"
 	"zhihu/app/like/types"
-	"zhihu/pkg/mq"
+
+	"github.com/redis/go-redis/v9"
+	"gorm.io/gorm"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -22,6 +21,8 @@ type LikeActionLogic struct {
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
+
+var lock sync.Mutex
 
 const LikeActionKey = "HASH_LIKE_RECORD"
 
@@ -34,6 +35,7 @@ func NewLikeActionLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LikeAc
 }
 
 func (l *LikeActionLogic) LikeAction(in *like.LikeActionRequest) (*like.LikeActionResponse, error) {
+	resp := &like.LikeActionResponse{}
 	// 1、获取当前用户对目标是否点赞
 	isLike, err := IsLike(l.ctx, l.svcCtx.RDB, l.svcCtx.DB, in.BizId, in.UserId, in.ObjId)
 	if err != nil {
@@ -43,11 +45,11 @@ func (l *LikeActionLogic) LikeAction(in *like.LikeActionRequest) (*like.LikeActi
 	switch in.ActionType {
 	case like.LikeActionRequest_LIKE:
 		if isLike {
-			return nil, errors.New("已经点赞过了")
+			return resp, nil
 		}
 	case like.LikeActionRequest_UNLIKE:
 		if !isLike {
-			return nil, errors.New("没有点赞过")
+			return resp, nil
 		}
 	}
 	// 3、投入处理队列
@@ -57,54 +59,7 @@ func (l *LikeActionLogic) LikeAction(in *like.LikeActionRequest) (*like.LikeActi
 		ObjId:      in.ObjId,
 		ActionType: in.ActionType,
 	}
-	val, err := json.Marshal(&value)
-	if err != nil {
-		return nil, err
-	}
-	_ = l.svcCtx.MQP.Publish("", &mq.MsgEntity{
-		MsgID: "like_action",
-		Key:   LikeActionKey,
-		Val:   string(val),
-	})
-
-	// 2、根据actionType判断是点赞还是取消点赞
-	switch in.ActionType {
-	case like.LikeActionRequest_LIKE:
-		if isLike {
-			return nil, errors.New("已经点赞过了")
-		} else {
-			// 2、更新数据库
-			likeRecord := model.LikeRecord{
-				BizId:  in.BizId,
-				ObjId:  in.ObjId,
-				UserId: in.UserId,
-			}
-			err = l.svcCtx.DB.Model(&model.LikeRecord{}).Create(&likeRecord).Error
-			if err != nil {
-				return nil, err
-			}
-			// 3、更新缓存
-			l.svcCtx.RDB.ZAdd(l.ctx, model.GetLikeRecordKey(in.BizId, in.UserId), redis.Z{
-				Member: in.ObjId,
-				Score:  float64(time.Now().Unix()),
-			})
-		}
-	case like.LikeActionRequest_UNLIKE:
-		if !isLike {
-			return nil, errors.New("没有点赞过")
-		} else {
-			// 2、更新数据库
-			err = l.svcCtx.DB.Model(&model.LikeRecord{}).
-				Where("obj_id = ? and biz_id = ? and user_id = ?", in.ObjId, in.BizId, in.UserId).
-				Delete(&model.LikeRecord{}).Error
-			if err != nil {
-				return nil, err
-			}
-			// 3、更新缓存
-			_ = l.svcCtx.RDB.ZRem(l.ctx, model.GetLikeRecordKey(in.BizId, in.UserId), in.ObjId).Err()
-		}
-	}
-
+	local_queue.LikeQueue.Push(&value)
 	return &like.LikeActionResponse{
 		LikeCount: 0,
 	}, nil
@@ -112,45 +67,33 @@ func (l *LikeActionLogic) LikeAction(in *like.LikeActionRequest) (*like.LikeActi
 
 // IsLike 查询是否对单个obj点过赞
 func IsLike(ctx context.Context, rdb *redis.Client, db *gorm.DB, bizId string, userId, objId int64) (bool, error) {
-	// 1、从缓存在获取当前用户对目标是否点赞
 	key := model.GetLikeRecordKey(bizId, userId)
 	member := fmt.Sprintf("%d", objId)
-	exists, err := ExistsInSortedSet(ctx, rdb, key, member)
-	if err != nil {
-		return false, err
-	}
-	if exists {
-		return true, nil
-	}
-	// 2、查询数据库获取当前用户对目标是否点赞
-	var likeRecord model.LikeRecord
-	err = db.Model(&model.LikeRecord{}).
-		Where("obj_id = ? and biz_id = ? and user_id = ?", objId, bizId, userId).
-		Limit(1).Find(&likeRecord).Error
-	if err != nil {
-		return false, err
-	}
-	if likeRecord.Id == 0 {
-		return false, nil
-	}
-	if likeRecord.DeletedAt.Valid {
-		return false, nil
-	}
-	// 3、更新缓存
-	rdb.ZAdd(ctx, key, redis.Z{
-		Member: member,
-		Score:  float64(time.Now().Unix()),
-	})
-	return true, nil
-}
-
-func ExistsInSortedSet(ctx context.Context, rdb *redis.Client, key string, member string) (bool, error) {
-	_, err := rdb.ZScore(ctx, key, member).Result()
-	if err != nil {
-		if errors.Is(err, redis.Nil) {
+	score, _ := rdb.ZScore(ctx, key, member).Result()
+	if score != 0 {
+		if score == -1 {
 			return false, nil
 		}
+		return true, nil
+	}
+	var likeRecord model.LikeRecord
+	if err := db.Model(&model.LikeRecord{}).Where("biz_id = ? and obj_id = ? and user_id = ?", bizId, objId, userId).Limit(1).Find(&likeRecord).Error; err != nil {
 		return false, err
+	}
+	var isLike bool
+	if likeRecord.Id != 0 {
+		isLike = true
+	}
+	if isLike {
+		_ = rdb.ZAdd(ctx, key, redis.Z{
+			Score:  float64(likeRecord.UpdatedAt.Unix()),
+			Member: member,
+		}).Err()
+	} else {
+		_ = rdb.ZAdd(ctx, key, redis.Z{
+			Score:  -1,
+			Member: member,
+		}).Err()
 	}
 	return true, nil
 }
