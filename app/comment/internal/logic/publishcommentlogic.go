@@ -2,8 +2,11 @@ package logic
 
 import (
 	"context"
-	"github.com/yitter/idgenerator-go/idgen"
+	"encoding/json"
 	"zhihu/app/comment/model"
+	"zhihu/pkg/mq"
+
+	"github.com/yitter/idgenerator-go/idgen"
 
 	"zhihu/app/comment/internal/svc"
 	"zhihu/app/comment/pb/comment"
@@ -51,11 +54,31 @@ func (l *PublishCommentLogic) PublishComment(in *comment.PublishCommentRequest) 
 	if err := l.svcCtx.DB.Create(_comment).Error; err != nil {
 		return nil, err
 	}
+
 	// 异步通知（如果是回复则通知被回复人）
-	if in.ParentId != 0 {
-		// 通知被回复人
-		// todo
-	}
+	go func() {
+		type notify struct {
+			ToUserId   int64  `json:"to_user_id"`
+			FromUserId int64  `json:"from_user_id"`
+			Type       int32  `json:"type"`
+			Content    string `json:"content"`
+		}
+		n := &notify{
+			ToUserId:   in.BeReplayUserId,
+			FromUserId: in.ReplayUserId,
+			Type:       3, // 评论
+			Content:    in.Content,
+		}
+		value, err := json.Marshal(n)
+		if err != nil {
+			logx.Error(err)
+		}
+		l.svcCtx.Producer.Publish("notify_topic", &mq.MsgEntity{
+			MsgID: "",
+			Key:   "",
+			Val:   string(value),
+		})
+	}()
 	return &comment.PublishCommentResponse{
 		Id: _comment.Id,
 	}, nil

@@ -92,6 +92,14 @@ func (l *VideoListLogic) VideoList(req *types.VideoListRequest, userId int64) (r
 				return nil, err
 			}
 
+			countResp, err := l.svcCtx.LikeRPC.GetPostLikeCount(l.ctx, &like.GetPostLikeCountRequest{
+				BizId: "video_like",
+				ObjId: videoFeed.VideoId,
+			})
+			if err != nil {
+				return nil, err
+			}
+
 			videoInfo := types.VideoInfo{
 				VideoId:       videoFeed.VideoId,
 				AuthorId:      videoFeed.AuthorId,
@@ -102,7 +110,7 @@ func (l *VideoListLogic) VideoList(req *types.VideoListRequest, userId int64) (r
 				CoverUrl:      videoFeed.CoverUrl,
 				Description:   videoFeed.Description,
 				CommentCount:  videoFeed.CommentCount,
-				LikeCount:     videoFeed.LikeCount,
+				LikeCount:     countResp.Count,
 				IsLike:        status.IsLiked,
 				IsInteraction: followMap[videoFeed.AuthorId],
 			}

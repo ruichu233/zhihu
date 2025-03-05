@@ -2,10 +2,11 @@ package redis
 
 import (
 	"context"
-	"github.com/redis/go-redis/v9"
 	"log"
 	mq "zhihu/pkg/mq"
 	"zhihu/pkg/utils"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type Consumer struct {
@@ -51,7 +52,7 @@ func (c *Consumer) Run(handler func(msg *mq.MsgEntity) error) {
 			Streams:  []string{c.topic, ">"},
 			Count:    1,
 			Block:    0,
-			NoAck:    false,
+			NoAck:    true,
 		}).Result()
 		if err != nil {
 			log.Printf("Error reading from stream: %v", err)

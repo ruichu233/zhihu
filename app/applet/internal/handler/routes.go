@@ -65,6 +65,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 					Path:    "/:obj_id/like",
 					Handler: LikeActionHandler(serverCtx),
 				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/:obj_id/likeNum",
+					Handler: LikeNumHandler(serverCtx),
+				},
 			}...,
 		),
 		rest.WithPrefix("/v1/like"),

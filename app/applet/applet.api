@@ -94,6 +94,9 @@ type (
 service applet-api {
 	@handler LikeActionHandler
 	post /:obj_id/like (LikeActionRequest) returns (LikeActionResponse)
+
+	@handler LikeNumHandler
+	post /:obj_id/likeNum (LikeNumRequest) returns (LikeNumResponse)
 }
 
 type LikeActionRequest {
@@ -104,6 +107,15 @@ type LikeActionRequest {
 
 type LikeActionResponse {
 	status string `json:"status"`
+}
+
+type LikeNumRequest {
+	bizId string `json:"biz_id"`
+	objId int64  `path:"obj_id"` // 对象ID
+}
+
+type LikeNumResponse {
+	likeNum int64 `json:"like_num"`
 }
 
 @server (

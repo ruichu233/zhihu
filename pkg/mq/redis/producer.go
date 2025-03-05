@@ -2,8 +2,9 @@ package redis
 
 import (
 	"context"
-	"github.com/redis/go-redis/v9"
 	"zhihu/pkg/mq"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type Producer struct {
@@ -12,14 +13,10 @@ type Producer struct {
 }
 
 func (p *Producer) Publish(topic string, msg *mq.MsgEntity) error {
-	toMap, err := msg.TransStructToMap()
-	if err != nil {
-		return err
-	}
 	p.rdb.XAdd(p.ctx, &redis.XAddArgs{
 		Stream: topic,
 		MaxLen: 10000,
-		Values: toMap,
+		Values: msg.Val,
 	})
 	return nil
 }

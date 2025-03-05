@@ -132,6 +132,15 @@ type LikeActionResponse struct {
 	Status string `json:"status"`
 }
 
+type LikeNumRequest struct {
+	BizId string `json:"biz_id"`
+	ObjId int64  `path:"obj_id"` // 对象ID
+}
+
+type LikeNumResponse struct {
+	LikeNum int64 `json:"like_num"`
+}
+
 type ListFollowRequest struct {
 	UserId     int64 `json:"user_id"`
 	FollowType int32 `json:"follow_type"` // 1 朋友 2 粉丝 3 关注

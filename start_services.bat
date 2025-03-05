@@ -39,7 +39,7 @@ call :wait_for_service 8001
 
 :: 启动点赞服务
 echo 正在启动 Like Service...
-start "Like Service" cmd /k "cd app\like && go run like.go -f etc/like.yaml"
+start "Like Service" cmd /k "cd app\like && go run . -f etc/like.yaml"
 call :wait_for_service 8002
 
 :: 启动评论服务
