@@ -6,11 +6,10 @@ import (
 	"zhihu/app/follow/model"
 	"zhihu/pkg/db"
 	"zhihu/pkg/mq"
-	_kafka "zhihu/pkg/mq/kafka"
+	_redis "zhihu/pkg/mq/redis"
 	"zhihu/pkg/rdb"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/segmentio/kafka-go"
 	"gorm.io/gorm"
 )
 
@@ -29,11 +28,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	if err := gormDb.AutoMigrate(&model.FollowsCount{}); err != nil {
 		panic(err)
 	}
-	writer := kafka.NewWriter(kafka.WriterConfig{
-		Brokers: []string{"127.0.0.1:9092"},
-		Topic:   "user_follow",
-	})
-
 	// kafkaConsumer := kafka.New(kafka.ReaderConfig{ // 创建消费者
 	// 	Brokers:  []string{"127.0.0.1:9092"},
 	// 	Topic:    "user_follow",
@@ -42,10 +36,11 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	// 	MaxBytes: 10e6, // 10MB
 	// 	MaxWait:  time.Second * 1,
 	// })
+	redisclient := rdb.InitRedis(&c.RDBConf)
 	return &ServiceContext{
 		Config: c,
 		DB:     db.InitMysql(&c.DBConf),
-		RDB:    rdb.InitRedis(&c.RDBConf),
-		Prod:   _kafka.NewProducer(context.Background(), writer),
+		RDB:    redisclient,
+		Prod:   _redis.NewProducer(context.Background(), redisclient),
 	}
 }

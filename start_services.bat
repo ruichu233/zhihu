@@ -62,10 +62,10 @@ echo 正在启动 Feed Service...
 start "Feed Service" cmd /k "cd app\feed && go run feed.go -f etc/feed.yaml"
 call :wait_for_service 8006
 
-@REM :: 启动通知服务
-@REM echo 正在启动 Notification Service...
-@REM start "Notification Service" cmd /k "cd app\notification && go run notification.go -f etc/notification.yaml"
-@REM call :wait_for_service 8007
+:: 启动通知服务
+echo 正在启动 Notification Service...
+start "Notification Service" cmd /k "cd app\notification && go run notification.go -f etc/notification.yaml"
+call :wait_for_service 8007
 
 :: 启动 API 网关
 echo 正在编译 API Gateway...

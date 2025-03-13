@@ -12,5 +12,5 @@ type Config struct {
 	DBConf  db.Conf
 	RDBConf rdb.Conf
 
-	Worker uint16
+	WorkId uint16
 }

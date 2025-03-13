@@ -19,6 +19,7 @@ func Init(rdb *redis.Client, db *gorm.DB) {
 	_rdb = rdb
 	_db = db
 	NotifyQueue = localqueue.NewBatchQueue(10000, 100, time.Second*1, localqueue.BatchMode)
+	Run()
 }
 
 func Run() {

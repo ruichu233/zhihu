@@ -73,11 +73,13 @@ func (l *PublishCommentLogic) PublishComment(in *comment.PublishCommentRequest) 
 		if err != nil {
 			logx.Error(err)
 		}
-		l.svcCtx.Producer.Publish("notify_topic", &mq.MsgEntity{
+		if err := l.svcCtx.Producer.Publish("notify_topic", &mq.MsgEntity{
 			MsgID: "",
 			Key:   "",
 			Val:   string(value),
-		})
+		}); err != nil {
+			logx.Error(err)
+		}
 	}()
 	return &comment.PublishCommentResponse{
 		Id: _comment.Id,

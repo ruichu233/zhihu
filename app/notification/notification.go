@@ -31,7 +31,7 @@ func main() {
 	conf.MustLoad(*configFile, &c)
 	ctx := svc.NewServiceContext(c)
 	localqueue.Init(ctx.RDB, ctx.DB)
-	idgenerator.InitIdGenerator(c.Worker)
+	idgenerator.InitIdGenerator(c.WorkId)
 	go func() {
 		ctx.Consumer.Run(func(msg *mq.MsgEntity) error {
 			type notify struct {
